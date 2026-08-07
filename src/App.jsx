@@ -456,33 +456,120 @@ function scoreToLevel(score) {
   return LEVELS[scoreToLevelIndex(score)];
 }
 
-const SECTIONS = ["Explorer's Mindset", "Problem Solving", "Reflection & Expression"];
+const SECTIONS = ["You And Your Thoughts", "You And The People Around You", "You And The World"];
 const SECTION_COLORS = [C.yellow, C.sky, C.pink];
 
+// Each section opens with a short story the student reads before answering
+// that section's questions — shown once, above the first question of the
+// section (see SECTION_STORIES + AssessmentScreen).
+const SECTION_STORIES = [
+  {
+    title: "\u201cSara and the Sweaty Leaf\u201d",
+    body: `Sara sat near the window, waiting for class to begin, when she noticed something strange. The plant on the windowsill had tiny drops of water along the edges of its leaves. \u201cIs it sweating?\u201d she whispered.
+
+Her friend giggled, \u201cMaybe it\u2019s nervous about being in school.\u201d
+
+Sara laughed too, but her mind kept spinning. \u201cCan plants feel hot? Why would they have water on them if no one watered them?\u201d
+
+Later on in the class, her teacher introduced her to the topic of \u201ctranspiration\u201d and about how plants lose water through their leaves in the process, and it clicked. She thought to herself, \u201cSo that\u2019s what it is!\u201d
+
+That evening, while brushing her teeth, she had an idea: \u201cMaybe I\u2019ll leave two plants in different places and see what happens.\u201d She grabbed her notebook and wrote down: Leaf water mystery \u2014 the transpiration trial.`,
+  },
+  {
+    title: "\u201cThe Wiggly Blue Line\u201d",
+    body: `It was a quiet afternoon in Geography class. The teacher rolled down the wall map of India and pointed to several blue lines criss-crossing the country.
+
+\u201cToday, we\u2019ll explore the Rivers of India,\u201d she said. \u201cThis one is the Ganga, flowing from the Himalayas all the way to the Bay of Bengal. Over here\u2019s the Yamuna, and this is the Brahmaputra, which enters India from Arunachal Pradesh.\u201d
+
+The students leaned forward. \u201cWhy are they all so thin?\u201d asked Anjali. \u201cThey look like blue threads.\u201d
+
+Imran raised his hand. \u201cMa\u2019am, rivers are huge and they branch out \u2014 why are they shown as just single lines?\u201d
+
+The teacher nodded. \u201cExcellent question, Imran. On maps, rivers are shown using symbols & simplified lines. That\u2019s because maps are made to show lots of information in a small space. This map shows the main course of each river, but it doesn\u2019t show the small streams, distributaries, or how wide they are.\u201d
+
+She drew a small sketch on the board. \u201cThe Ganga, for example, has many tributaries like the Gandak and Ghaghara, and forms a massive delta with the Brahmaputra. But that complexity can\u2019t all fit here.\u201d
+
+She paused. \u201cSo, maps help us learn where rivers flow, but we also need to ask \u2014 what do they leave out?\u201d
+
+Suddenly, the wiggly blue lines didn\u2019t seem so simple anymore.`,
+  },
+  {
+    title: "\u201cNewsroom Shuffle\u201d",
+    body: `Last week, Class 8A was taken to the AV room to watch a news bulletin. But this time, the anchor wasn\u2019t a person \u2014 it was an AI: a glowing screen with a computer voice that said, \u201cGood evening. Here is your news update.\u201d
+
+It showed flood alerts, cricket scores, and even a story about a school winning a science award \u2014 all without mistakes, pauses, or expressions.
+
+Some students clapped. \u201cIt\u2019s fast and perfect!\u201d said one. But Ranya frowned. \u201cIt didn\u2019t even pause during the sad news. It just\u2026 kept going like a robot.\u201d
+
+Later, the teacher asked, \u201cWhat should news do \u2014 just give facts, or help us feel and think too?\u201d
+
+The room went quiet. Then the debates began.`,
+  },
+];
+
+// The real Qriosity Quest question paper (edjuvenate.com) — 18 questions,
+// Section A: 8 questions (3 MCQ + 5 open text), Section B: 8 questions
+// (3 MCQ + 5 open text), Section C: 2 open-text questions. Left verbatim.
 const QUESTIONS = [
-  // Section 1 — Explorer's Mindset (MCQ-heavy)
-  { section: 0, type: "mcq", prompt: "When you get a new gadget or toy, what do you do first?", options: ["Read the instructions carefully", "Start pressing buttons to see what happens", "Ask someone who's used it before", "Watch a video about it first"] },
-  { section: 0, type: "mcq", prompt: "You find a locked box with no key. What's your first thought?", options: ["I wonder what's inside and how it opens", "That's not my problem", "Someone will open it eventually", "I'd ask an adult to deal with it"] },
-  { section: 0, type: "text", prompt: "Describe a time you asked 'why' or 'how' about something and kept digging until you found the answer." },
-  { section: 0, type: "mcq", prompt: "In class, you finish an assignment early. You'd rather:", options: ["Explore a related topic further", "Help a classmate who's stuck", "Wait quietly for others to finish", "Start on tomorrow's homework"] },
-  { section: 0, type: "mcq", prompt: "Which sounds most fun on a weekend?", options: ["Visiting a science museum or exhibit", "Building or making something from scratch", "Reading about a topic you love", "Trying a new recipe or experiment"] },
-  { section: 0, type: "text", prompt: "If you could ask any question and instantly get the true answer, what would you ask?" },
+  // Section A — You And Your Thoughts (story: "Sara and the Sweaty Leaf")
+  { section: 0, type: "mcq", prompt: "If you saw tiny water drops on a plant\u2019s leaf, like Sara did, what would you most likely do or think next?", options: [
+    "Why does this happen? What\u2019s the science behind it?",
+    "Is the plant okay? What would it say if it could talk?",
+    "I should ask someone about this or try to check it myself.",
+    "What if I create a notebook to track where & when it happens?",
+    "Cool! Let me try this with another plant to see if the same thing happens.",
+  ] },
+  { section: 0, type: "text", prompt: "If you had a plant that could talk, how would you feel about it, what would you ask the plant? Why would you ask those questions?" },
+  { section: 0, type: "text", prompt: "Imagine Sara is telling her story to you. What are 2\u20133 questions you could ask to understand the situation better? Why would you ask those questions?" },
+  { section: 0, type: "mcq", prompt: "When you heard Sara\u2019s story about the plant with droplets, what part caught your attention the most?", options: [
+    "The fact that something so small made her ask a big question.",
+    "That she imagined the plant sweating and made it feel like a person.",
+    "That she thought about tracking patterns & making sense of them herself.",
+    "That she turned it into a fun mystery, almost like a game.",
+    "That she didn\u2019t wait for class but started testing ideas at home.",
+  ] },
+  { section: 0, type: "text", prompt: "If you could invent something fun or helpful to understand what\u2019s going on with plants, what would it be? What would it do?" },
+  { section: 0, type: "text", prompt: "Sara saw water droplets on a leaf and started wondering about them. What kind of \u2018why\u2019 or \u2018how\u2019 question would you ask if you were in her place? What do you think might be the reason behind it?" },
+  { section: 0, type: "mcq", prompt: "If you were trying to understand the leaf mystery better, what would you do first?", options: [
+    "Raise the question in class to the teacher or to someone at home.",
+    "Look at different plants and compare which ones have water on their leaves.",
+    "Ask others what they think is going on and discuss it with friends.",
+    "Read more about how water moves through plants.",
+    "Design an experiment to test how different environments affect the droplets.",
+  ] },
+  { section: 0, type: "text", prompt: "If you were Sara\u2019s friend & noticed the leaf mystery too, what step would you take to help solve it? Would you ask a question in class, try an experiment at home, or share your guess out loud?" },
 
-  // Section 2 — Problem Solving
-  { section: 1, type: "mcq", prompt: "Your plan for a project isn't working. What do you do?", options: ["Try a completely different approach", "Tweak the plan slightly and try again", "Ask someone for help", "Take a short break, then come back to it"] },
-  { section: 1, type: "mcq", prompt: "A puzzle has more pieces than you expected. You:", options: ["Sort pieces by edge/colour before starting", "Just start connecting pieces randomly", "Look at the picture on the box first", "Ask a friend to help sort them"] },
-  { section: 1, type: "text", prompt: "Walk through how you'd figure out the fastest way to get 5 friends across a river with only one small boat that fits 2 people." },
-  { section: 1, type: "mcq", prompt: "You're given a math problem you've never seen before. Your instinct is to:", options: ["Break it into smaller, familiar steps", "Guess and check different answers", "Look for a similar problem you've solved before", "Ask for a hint before trying"] },
-  { section: 1, type: "mcq", prompt: "Two friends disagree about how to split a bag of marbles fairly. You'd suggest:", options: ["Counting the total and dividing equally", "Letting them take turns picking one at a time", "Asking a third person to decide", "Weighing the bag and splitting by weight"] },
-  { section: 1, type: "text", prompt: "Describe a problem you solved in an unusual or creative way." },
+  // Section B — You And The People Around You (story: "The Wiggly Blue Line")
+  { section: 1, type: "text", prompt: "Have you ever seen a map or chart that surprised you and made you think, \u201cWait \u2014 is that how it really looks!\u201d? What did you notice? And what questions came to your mind?" },
+  { section: 1, type: "text", prompt: "Imagine you could redesign the river map to include more details about how rivers actually behave. What would you add to make it more complete or interesting?" },
+  { section: 1, type: "mcq", prompt: "If you were Imran & saw that the river looked like a string, what would you most likely be curious about?", options: [
+    "I would speak up or ask the teacher about what else the map could tell us.",
+    "Maybe I can draw or design a map that shows the river more realistically.",
+    "Can I find a different map that shows the river in more detail?",
+    "What parts of the river are missing from this map?",
+    "I wonder if other students also noticed this or felt confused.",
+  ] },
+  { section: 1, type: "mcq", prompt: "If you noticed something missing on a map in class, what would you do next?", options: [
+    "Discuss with a friend & look for answers together.",
+    "Try to understand what the map is actually trying to show.",
+    "Raise the point in class or ask the teacher directly.",
+    "Sketch an improved version of the map in my notebook.",
+    "Compare it with another source, like an atlas or globe.",
+  ] },
+  { section: 1, type: "mcq", prompt: "After Imran asked his question about the river, what would you be most interested in doing or thinking next?", options: [
+    "I\u2019d look through the atlas or globe to compare how other rivers are shown.",
+    "I\u2019d try to understand how mapmakers decide what to include or leave out.",
+    "I\u2019d look around to see if others were confused or thinking the same thing.",
+    "I\u2019d raise my hand and ask another question or share my thoughts.",
+    "I\u2019d sketch a new kind of river map that includes tributaries, width, and movement.",
+  ] },
+  { section: 1, type: "text", prompt: "If you had to ask questions to better understand the rivers of India based on maps, what questions would you ask? And why would you ask them?" },
+  { section: 1, type: "text", prompt: "If you were in that Geography class and also had a question about how rivers are shown on the map, what would you do? Would you ask your teacher, try to find the answer by discussing with your friends, or try to find the answer yourself?" },
+  { section: 1, type: "text", prompt: "Imagine that Imran didn\u2019t say his question out loud, but you noticed he looked puzzled while staring at the map. What would you do, and how would you know something was on his mind?" },
 
-  // Section 3 — Reflection & Expression
-  { section: 2, type: "text", prompt: "What's something you're proud of that you worked hard for?" },
-  { section: 2, type: "mcq", prompt: "When you disagree with a friend, you usually:", options: ["Explain your view and ask about theirs", "Let it go to keep the peace", "Try to find a compromise", "Stick firmly to your opinion"] },
-  { section: 2, type: "text", prompt: "If a younger student asked you to explain your favourite subject in one minute, what would you say?" },
-  { section: 2, type: "mcq", prompt: "When something doesn't go your way, you tend to:", options: ["Figure out what to try differently next time", "Feel upset for a while, then move on", "Ask someone for advice", "Try again immediately without changing anything"] },
-  { section: 2, type: "text", prompt: "Tell us about a time you had to keep trying even when something felt hard." },
-  { section: 2, type: "mcq", prompt: "What matters most to you when working in a group?", options: ["Everyone's ideas get heard", "The task gets done well and on time", "Everyone has fun doing it", "Roles are clearly divided"] },
+  // Section C — You And The World (story: "Newsroom Shuffle")
+  { section: 2, type: "text", prompt: "What\u2019s one question, or idea you\u2019ve had recently about how AI works, or how it should work in the future? Explain briefly in your own words." },
+  { section: 2, type: "text", prompt: "If you built an AI tutor for your class, what three abilities would it need to spark genuine curiosity? Explain why each is important." },
 ];
 
 function seededScores(seed) {
@@ -812,6 +899,9 @@ function LoginScreen({ go }) {
           <div style={{ flex: 1, height: 1, background: BORDER }} />
         </div>
         <GoogleButton onClick={() => go("dashboard", { studentName: "tanvi" })} />
+        <div style={{ marginTop: 12 }}>
+          <MockNote>Google OAuth via Supabase happens here.</MockNote>
+        </div>
       </form>
       <p style={{ textAlign: "center", fontSize: 12.5, color: FAINT, marginTop: 18 }}>
         Having trouble? Contact your teacher or school administrator.
@@ -829,7 +919,7 @@ function AdminLoginScreen({ go }) {
   const [password, setPassword] = useState("password123");
   return (
     <AuthShell>
-      <AuthHeader pillLabel="Admin Login" pillBg={C.navy} pillColor={C.white} title="Welcome Admin" emoji="🔐" />
+      <AuthHeader pillLabel="Admin Login" pillBg={C.navy} pillColor={C.white} title="Welcome, Admin" emoji="🔐" />
       <form onSubmit={(e) => { e.preventDefault(); go("adminDashboard"); }}>
         <Field label="Email address">
           <input className="qq-input" style={{ background: SKY_TINT }} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -999,37 +1089,71 @@ function StudentDashboard({ go, studentName, myStudent }) {
    ========================================================================= */
 
 function AssessmentIntroScreen({ go }) {
-  const items = [
-    { icon: <ClipboardList size={18} />, text: "18 questions across 3 short sections" },
-    { icon: <Pencil size={18} />, text: "A mix of multiple-choice and short written answers" },
-    { icon: <Clock size={18} />, text: "45 minutes on the clock — but take your time to think" },
-    { icon: <ChevronLeft size={18} />, text: "You can move back and forth between questions before submitting" },
+  const tips = [
+    "There are no wrong answers",
+    "Be honest, be real",
+    "Don't try to impress — try to express",
+    "Let your instincts guide you",
+    "Your imagination is your best tool",
+  ];
+  const sections = [
+    { name: "Section A", title: "You And Your Thoughts", hook: "What makes your brain buzz with questions?" },
+    { name: "Section B", title: "You And The People Around You", hook: "How do you understand others & respond to what they say or do?" },
+    { name: "Section C", title: "You And The World", hook: "How do you explore ideas, news, and the bigger picture?" },
   ];
   return (
-    <div style={{ minHeight: "100vh", background: `linear-gradient(160deg, ${C.cream}, ${C.white})`, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 20px" }}>
-      <div className="qq-card qq-fade-in" style={{ maxWidth: 560, width: "100%", padding: 48, textAlign: "center" }}>
-        <div style={{
-          width: 84, height: 84, borderRadius: "50%", background: `linear-gradient(135deg, ${C.yellow}, ${C.pink})`,
-          display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px",
-        }}>
-          <Rocket size={38} color={C.white} />
+    <div style={{ minHeight: "100vh", background: `linear-gradient(160deg, ${C.cream}, ${C.white})`, padding: "48px 20px" }}>
+      <div className="qq-card qq-fade-in" style={{ maxWidth: 680, width: "100%", margin: "0 auto", padding: 48 }}>
+        <div style={{ textAlign: "center", marginBottom: 8 }}>
+          <LogoMark size={48} />
         </div>
-        <div className="qq-heading" style={{ fontSize: 30, color: C.navy, marginBottom: 10 }}>Your Qriosity Quest begins!</div>
-        <p style={{ color: MUTED, marginBottom: 28, fontSize: 15 }}>
-          There are no wrong answers here — just be yourself. Here's what to expect:
+        <div className="qq-heading" style={{ fontSize: 30, color: C.navy, textAlign: "center", marginBottom: 4 }}>Welcome to Your Qriosity Quest</div>
+
+        <div className="qq-heading" style={{ fontSize: 22, color: C.ink, textAlign: "center", margin: "22px 0 10px" }}>This isn't a test.</div>
+        <p style={{ color: MUTED, textAlign: "center", fontSize: 14.5, lineHeight: 1.6, maxWidth: 480, margin: "0 auto" }}>
+          It's an invitation to explore how your mind <strong style={{ color: C.ink }}>thinks, feels,</strong> and <strong style={{ color: C.ink }}>wonders</strong>. You're not being judged. You're being understood.
         </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14, textAlign: "left", marginBottom: 32 }}>
-          {items.map((it, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, background: C.cream, borderRadius: 14, padding: "12px 16px" }}>
-              <div style={{ width: 34, height: 34, borderRadius: 10, background: C.white, display: "flex", alignItems: "center", justifyContent: "center", color: C.blue, flexShrink: 0 }}>
-                {it.icon}
-              </div>
-              <span style={{ fontSize: 14.5, color: C.ink }}>{it.text}</span>
+        <p style={{ color: MUTED, textAlign: "center", fontSize: 14.5, lineHeight: 1.6, maxWidth: 480, margin: "10px auto 0" }}>
+          Some questions may surprise you. Others might intrigue you. All are designed to tell you how your curiosity works.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, margin: "30px 0" }} className="qq-report-grid">
+          <div style={{ background: C.cream, borderRadius: 18, padding: 22 }}>
+            <Eyebrow bg={C.yellow}>Before you begin</Eyebrow>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
+              {tips.map((t, i) => (
+                <div key={i} style={{ fontSize: 13.5, color: C.ink, display: "flex", gap: 8 }}>
+                  <span style={{ color: C.blue, fontWeight: 700 }}>•</span> {t}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+          <div style={{ background: C.cream, borderRadius: 18, padding: 22 }}>
+            <Eyebrow bg={C.yellow}>What you'll discover</Eyebrow>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 14 }}>
+              {sections.map((s) => (
+                <div key={s.name}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{s.name}: {s.title}</div>
+                  <div style={{ fontSize: 12.5, color: MUTED }}>{s.hook}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", marginBottom: 22 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: MUTED }}><ClipboardList size={16} color={C.blue} /> 18 questions, 3 sections</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: MUTED }}><Clock size={16} color={C.blue} /> 45 minutes on the clock</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: MUTED }}><ChevronLeft size={16} color={C.blue} /> Move back & forth freely</div>
+        </div>
+
+        <div style={{ textAlign: "center", marginBottom: 22 }}>
+          <div className="qq-heading" style={{ fontSize: 17, color: C.navy }}>Are you ready to dive into your own mind?</div>
+          <p style={{ fontSize: 14, color: MUTED, margin: "4px 0 0" }}>Let's begin. Be curious. Be brave. Be completely you.</p>
+        </div>
+
         <PillButton variant="yellow" size="lg" full onClick={() => go("assessment")}>Begin Quest <ArrowRight size={16} /></PillButton>
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 16, textAlign: "center" }}>
           <a onClick={() => go("dashboard")} style={{ fontSize: 13, color: MUTED, cursor: "pointer", fontWeight: 700 }}>← Back to dashboard</a>
         </div>
       </div>
@@ -1075,6 +1199,13 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
   const sectionStart = QUESTIONS.findIndex((qq) => qq.section === q.section);
   const sectionCount = QUESTIONS.filter((qq) => qq.section === q.section).length;
   const posInSection = currentQ - sectionStart;
+  const story = SECTION_STORIES[q.section];
+
+  // The section's story auto-expands the first time you land on that
+  // section's first question, and can be toggled open again on any of
+  // that section's later questions via "Re-read the story".
+  const [storyOpen, setStoryOpen] = useState(posInSection === 0);
+  useEffect(() => { setStoryOpen(posInSection === 0); }, [currentQ]);
 
   return (
     <div style={{ minHeight: "100vh", background: C.cream, display: "flex", flexDirection: "column" }}>
@@ -1122,6 +1253,31 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
           <Eyebrow bg={sectionColor} color={q.section === 0 ? C.navy : C.white}>
             Section {q.section + 1} · {SECTIONS[q.section]} · {posInSection + 1}/{sectionCount}
           </Eyebrow>
+
+          {storyOpen ? (
+            <div style={{ background: C.cream, borderRadius: 16, padding: 20, margin: "16px 0" }}>
+              <div className="qq-heading" style={{ fontSize: 16, color: C.navy, marginBottom: 8 }}>{story.title}</div>
+              <div style={{ fontSize: 13, color: C.ink, lineHeight: 1.7, whiteSpace: "pre-line", maxHeight: 260, overflowY: "auto" }} className="qq-scrollhide">
+                {story.body}
+              </div>
+              <button
+                type="button"
+                onClick={() => setStoryOpen(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: C.blue, fontSize: 12.5, fontWeight: 700, marginTop: 10, padding: 0 }}
+              >
+                Hide story
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setStoryOpen(true)}
+              style={{ display: "block", background: "none", border: "none", cursor: "pointer", color: C.blue, fontSize: 12.5, fontWeight: 700, margin: "14px 0 0", padding: 0 }}
+            >
+              📖 Re-read the {story.title} story
+            </button>
+          )}
+
           <div className="qq-heading" style={{ fontSize: 23, color: C.navy, margin: "18px 0 26px", lineHeight: 1.4 }}>
             {q.prompt}
           </div>
