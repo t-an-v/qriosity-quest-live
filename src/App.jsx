@@ -7,6 +7,7 @@ import {
   Star, MapPin, Send, RefreshCw, Pencil, Check, X, LayoutGrid, Users,
   ClipboardList, ShieldCheck, Compass, Mail, Download, Lock, ArrowRight,
   CircleCheck, CircleDashed, CircleEllipsis, GraduationCap,
+  Eye, EyeOff, AlertTriangle, Search, FileText, ChevronDown,
 } from "lucide-react";
 
 /* =========================================================================
@@ -381,7 +382,7 @@ function MockNote({ children, style }) {
         gap: 10,
         alignItems: "flex-start",
         background: SKY_TINT,
-        border: "1.5px dashed ${BLUE_BORDER}",
+        border: `1.5px dashed ${BLUE_BORDER}`,
         borderRadius: 14,
         padding: "12px 16px",
         fontSize: 12.5,
@@ -428,64 +429,32 @@ function StarRating() {
    MOCK DATA
    ========================================================================= */
 
-const TRAITS = ["Curiosity", "Logical Reasoning", "Creativity", "Communication", "Resilience"];
+const TRAITS = ["Insight Seeking", "Joyful Discovery", "People Reader", "Bold Engager", "Conceptual Innovator"];
 
+// Trait descriptions summarized from rubric.json's traits object (founder Master Rubric).
 const TRAIT_BLURBS = {
-  "Curiosity": "Asks questions others don't think to ask, and loves chasing down a good 'why'.",
-  "Logical Reasoning": "Breaks problems into steps and looks for patterns before jumping to an answer.",
-  "Creativity": "Comes up with original ideas and isn't afraid of an unusual approach.",
-  "Communication": "Explains thinking clearly and listens well to other points of view.",
-  "Resilience": "Keeps trying different approaches when the first one doesn't work.",
+  "Insight Seeking": "Digs until they understand the full picture — asks 'why', chases evidence, doesn't stop at the first answer.",
+  "Joyful Discovery": "Explores something purely because it's fun or fascinating — the delight of 'wow, I didn't know that.'",
+  "People Reader": "Curious about people — what they're thinking or feeling, and why they acted the way they did.",
+  "Bold Engager": "Takes the first step into something new or uncertain, rather than waiting to be told what to do.",
+  "Conceptual Innovator": "Comfortable with big or ambiguous ideas — reimagines how something could work rather than just describing how it does.",
 };
 
-const TRAIT_ICON_COLOR = { "Curiosity": C.yellow, "Logical Reasoning": C.blue, "Creativity": C.pink, "Communication": C.sky, "Resilience": C.navy };
+const TRAIT_ICON_COLOR = { "Insight Seeking": C.yellow, "Conceptual Innovator": C.blue, "Bold Engager": C.pink, "Joyful Discovery": C.sky, "People Reader": C.navy };
 
-function seededScores(seed) {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 9973;
-  return TRAITS.map((t, i) => {
-    const v = (h * (i + 3)) % 41; // 0-40
-    return { trait: t, score: 55 + v }; // 55-95
-  });
+// TODO: replace with founder-confirmed level thresholds — see rubric.json trait_levels._todo.
+// Master Rubric only defines the 4 levels qualitatively (no numeric cutoffs yet), so this is a
+// placeholder quartile split over the mock 55-95 score range generated below. Do not treat as final.
+const LEVELS = ["Emerging", "Developing", "Demonstrating", "Excelling"];
+function scoreToLevelIndex(score) {
+  if (score < 65) return 0;
+  if (score < 78) return 1;
+  if (score < 90) return 2;
+  return 3;
 }
-
-function topTraits(scores, n = 2) {
-  return [...scores].sort((a, b) => b.score - a.score).slice(0, n).map((s) => s.trait);
+function scoreToLevel(score) {
+  return LEVELS[scoreToLevelIndex(score)];
 }
-
-function generateLetter(name, scores) {
-  const [first, second] = topTraits(scores, 2);
-  return `Dear Parent/Guardian of ${name},
-
-Thank you for letting ${name} take part in Qriosity Quest! Over 18 short activities, ${name} showed real strength in ${first} and ${second} — the kind of thinking that shows up when a child is genuinely engaged, not just going through the motions.
-
-A few things we noticed: ${name} ${TRAIT_BLURBS[first].toLowerCase()} We also saw moments where ${TRAIT_BLURBS[second].toLowerCase()}
-
-There's no "pass or fail" here — this map is simply a starting point for a conversation about how ${name} thinks and learns best. We'd love for you to ask ${name} about their favourite question from the quest!
-
-With curiosity,
-The Qriosity Quest Team`;
-}
-
-function makeStudent(id, name, email, grade, status) {
-  const scores = seededScores(name);
-  return {
-    id, name, email, grade, status,
-    scores,
-    letter: generateLetter(name.split(" ")[0], scores),
-  };
-}
-
-const INITIAL_STUDENTS = [
-  makeStudent(1, "Tanvi Rao", "tanvi@edjuvenate.com", "Grade 6", "submitted"),
-  makeStudent(2, "Aarav Mehta", "aarav.m@edjuvenate.com", "Grade 7", "sent"),
-  makeStudent(3, "Ishita Kapoor", "ishita.k@edjuvenate.com", "Grade 6", "not_started"),
-  makeStudent(4, "Rohan Verma", "rohan.v@edjuvenate.com", "Grade 8", "submitted"),
-  makeStudent(5, "Sara Ali", "sara.ali@edjuvenate.com", "Grade 7", "sent"),
-  makeStudent(6, "Kabir Singh", "kabir.s@edjuvenate.com", "Grade 6", "not_started"),
-  makeStudent(7, "Meera Nair", "meera.n@edjuvenate.com", "Grade 8", "submitted"),
-  makeStudent(8, "Dev Patel", "dev.p@edjuvenate.com", "Grade 7", "not_started"),
-];
 
 const SECTIONS = ["Explorer's Mindset", "Problem Solving", "Reflection & Expression"];
 const SECTION_COLORS = [C.yellow, C.sky, C.pink];
@@ -515,6 +484,100 @@ const QUESTIONS = [
   { section: 2, type: "text", prompt: "Tell us about a time you had to keep trying even when something felt hard." },
   { section: 2, type: "mcq", prompt: "What matters most to you when working in a group?", options: ["Everyone's ideas get heard", "The task gets done well and on time", "Everyone has fun doing it", "Roles are clearly divided"] },
 ];
+
+function seededScores(seed) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 9973;
+  return TRAITS.map((t, i) => {
+    const v = (h * (i + 3)) % 41; // 0-40
+    return { trait: t, score: 55 + v }; // 55-95
+  });
+}
+
+// A small pool of generic placeholder open-text responses used to seed mock
+// answers for roster students who never actually took the live quiz. These
+// are NOT the real 18-question option text (left untouched per spec) — just
+// filler so the admin "raw answers" view has something realistic to show.
+const SAMPLE_TEXT_ANSWERS = [
+  "I'd probably ask a few questions first and then try it out myself to see what happens.",
+  "I think I'd start by looking closely at what's different, then ask someone who might know.",
+  "I'd try breaking it into smaller pieces and tackle each one before putting it back together.",
+  "I'd want to understand the reason behind it, so I'd keep asking follow-up questions.",
+  "I'd probably sketch it out or explain it to a friend to make sure I really understood it.",
+  "I'd try a few different ways and see which one actually works best.",
+];
+
+// Deterministic mock answers for the pre-seeded admin roster (id/name based),
+// matching QUESTIONS' order and types so the raw-answers viewer has real data
+// to show even for students who didn't take the live quiz in this session.
+function seededAnswers(seed) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 9973;
+  return QUESTIONS.map((q, i) => {
+    if (q.type === "mcq") {
+      return { type: "mcq", value: (h * (i + 2) + i) % q.options.length };
+    }
+    return { type: "text", value: SAMPLE_TEXT_ANSWERS[(h + i) % SAMPLE_TEXT_ANSWERS.length] };
+  });
+}
+
+// Normalizes the live AssessmentScreen answers object ({ [qIndex]: value })
+// into the same { type, value } array shape used by seededAnswers, so both
+// live and pre-seeded students render through the same raw-answers viewer.
+function normalizeAnswers(liveAnswers) {
+  return QUESTIONS.map((q, i) => {
+    const raw = liveAnswers[i];
+    if (q.type === "mcq") {
+      return { type: "mcq", value: typeof raw === "number" ? raw : null };
+    }
+    return { type: "text", value: typeof raw === "string" ? raw : "" };
+  });
+}
+
+function topTraits(scores, n = 2) {
+  return [...scores].sort((a, b) => b.score - a.score).slice(0, n).map((s) => s.trait);
+}
+
+function generateLetter(name, scores) {
+  const [first, second] = topTraits(scores, 2);
+  return `Dear Parent/Guardian of ${name},
+
+Thank you for letting ${name} take part in Qriosity Quest! Over 18 short activities, ${name} showed real strength in ${first} and ${second} — the kind of thinking that shows up when a child is genuinely engaged, not just going through the motions.
+
+A few things we noticed: ${name} ${TRAIT_BLURBS[first].toLowerCase()} We also saw moments where ${TRAIT_BLURBS[second].toLowerCase()}
+
+There's no "pass or fail" here — this map is simply a starting point for a conversation about how ${name} thinks and learns best. We'd love for you to ask ${name} about their favourite question from the quest!
+
+With curiosity,
+The Qriosity Quest Team`;
+}
+
+function sameFirstName(a, b) {
+  if (!a || !b) return false;
+  return a.trim().split(" ")[0].toLowerCase() === b.trim().split(" ")[0].toLowerCase();
+}
+
+function makeStudent(id, name, email, grade, status) {
+  const scores = seededScores(name);
+  return {
+    id, name, email, grade, status,
+    scores,
+    letter: generateLetter(name.split(" ")[0], scores),
+    answers: seededAnswers(name),
+  };
+}
+
+const INITIAL_STUDENTS = [
+  makeStudent(1, "Tanvi Rao", "tanvi@edjuvenate.com", "Grade 6", "submitted"),
+  makeStudent(2, "Aarav Mehta", "aarav.m@edjuvenate.com", "Grade 7", "sent"),
+  makeStudent(3, "Ishita Kapoor", "ishita.k@edjuvenate.com", "Grade 6", "not_started"),
+  makeStudent(4, "Rohan Verma", "rohan.v@edjuvenate.com", "Grade 8", "submitted"),
+  makeStudent(5, "Sara Ali", "sara.ali@edjuvenate.com", "Grade 7", "sent"),
+  makeStudent(6, "Kabir Singh", "kabir.s@edjuvenate.com", "Grade 6", "not_started"),
+  makeStudent(7, "Meera Nair", "meera.n@edjuvenate.com", "Grade 8", "submitted"),
+  makeStudent(8, "Dev Patel", "dev.p@edjuvenate.com", "Grade 7", "not_started"),
+];
+
 
 /* =========================================================================
    DEV NAV — floating, non-linear screen picker (prototype only)
@@ -649,6 +712,50 @@ function Field({ label, children }) {
   );
 }
 
+function PasswordField({ value, onChange }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: "relative" }}>
+      <input
+        className="qq-input"
+        type={show ? "text" : "password"}
+        value={value}
+        onChange={onChange}
+        style={{ paddingRight: 44 }}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((s) => !s)}
+        aria-label={show ? "Hide password" : "Show password"}
+        style={{
+          position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+          background: "none", border: "none", cursor: "pointer", color: MUTED,
+          display: "flex", alignItems: "center", padding: 4,
+        }}
+      >
+        {show ? <EyeOff size={17} /> : <Eye size={17} />}
+      </button>
+    </div>
+  );
+}
+
+/** "Continue with Google" — visually consistent with the primary button,
+ *  neutral (no Google brand colors, to stay within the official palette). */
+function GoogleButton({ onClick }) {
+  return (
+    <button type="button" onClick={onClick} className="qq-btn" style={{
+      ...BTN_VARIANTS.outline, padding: "13px 26px", fontSize: 15, width: "100%",
+    }}>
+      <span style={{
+        width: 18, height: 18, borderRadius: "50%", border: `2px solid ${C.navy}`,
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        fontSize: 11, fontWeight: 800,
+      }}>G</span>
+      Continue with Google
+    </button>
+  );
+}
+
 function SignupScreen({ go }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -673,9 +780,6 @@ function SignupScreen({ go }) {
           </select>
         </Field>
         <PillButton type="submit" variant="navy" full size="lg" style={{ marginTop: 6 }}>Create My Account</PillButton>
-        <div style={{ marginTop: 14 }}>
-          <MockNote>this will create a real account via Supabase auth and store the student's profile in the database.</MockNote>
-        </div>
       </form>
       <div style={{ textAlign: "center", marginTop: 22, fontSize: 13.5, color: MUTED }}>
         Already have an account?{" "}
@@ -687,7 +791,7 @@ function SignupScreen({ go }) {
 
 function LoginScreen({ go }) {
   const [email, setEmail] = useState("tanvi@edjuvenate.com");
-  const [password, setPassword] = useState("••••••••");
+  const [password, setPassword] = useState("password123");
   return (
     <AuthShell>
       <AuthHeader pillLabel="Student Login" pillBg={C.sky} pillColor={C.white} title="Welcome back!" emoji="👋" />
@@ -696,9 +800,18 @@ function LoginScreen({ go }) {
           <input className="qq-input" style={{ background: SKY_TINT }} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
         <Field label="Password">
-          <input className="qq-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordField value={password} onChange={(e) => setPassword(e.target.value)} />
+          <div style={{ textAlign: "right", marginTop: 6 }}>
+            <a onClick={() => {}} style={{ fontSize: 12.5, color: C.blue, fontWeight: 700, cursor: "pointer" }}>Forgot password?</a>
+          </div>
         </Field>
         <PillButton type="submit" variant="navy" full size="lg" style={{ marginTop: 6 }}>Log In</PillButton>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 0" }}>
+          <div style={{ flex: 1, height: 1, background: BORDER }} />
+          <span style={{ fontSize: 12, color: FAINT, fontWeight: 700 }}>OR</span>
+          <div style={{ flex: 1, height: 1, background: BORDER }} />
+        </div>
+        <GoogleButton onClick={() => go("dashboard", { studentName: "tanvi" })} />
       </form>
       <p style={{ textAlign: "center", fontSize: 12.5, color: FAINT, marginTop: 18 }}>
         Having trouble? Contact your teacher or school administrator.
@@ -713,7 +826,7 @@ function LoginScreen({ go }) {
 
 function AdminLoginScreen({ go }) {
   const [email, setEmail] = useState("admin@edjuvenate.com");
-  const [password, setPassword] = useState("••••••••");
+  const [password, setPassword] = useState("password123");
   return (
     <AuthShell>
       <AuthHeader pillLabel="Admin Login" pillBg={C.navy} pillColor={C.white} title="Welcome back, Admin" emoji="🔐" />
@@ -722,13 +835,22 @@ function AdminLoginScreen({ go }) {
           <input className="qq-input" style={{ background: SKY_TINT }} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
         <Field label="Password">
-          <input className="qq-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordField value={password} onChange={(e) => setPassword(e.target.value)} />
+          <div style={{ textAlign: "right", marginTop: 6 }}>
+            <a onClick={() => {}} style={{ fontSize: 12.5, color: C.blue, fontWeight: 700, cursor: "pointer" }}>Forgot password?</a>
+          </div>
         </Field>
         <PillButton type="submit" variant="navy" full size="lg" style={{ marginTop: 6 }}>
           <Lock size={15} /> Log In
         </PillButton>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 0" }}>
+          <div style={{ flex: 1, height: 1, background: BORDER }} />
+          <span style={{ fontSize: 12, color: FAINT, fontWeight: 700 }}>OR</span>
+          <div style={{ flex: 1, height: 1, background: BORDER }} />
+        </div>
+        <GoogleButton onClick={() => go("adminDashboard")} />
         <div style={{ marginTop: 14 }}>
-          <MockNote>Supabase auth (with an admin role check) will validate credentials here.</MockNote>
+          <MockNote>Supabase auth (with an admin role check) will validate credentials here, and Google OAuth via Supabase happens here for the button above.</MockNote>
         </div>
       </form>
       <p style={{ textAlign: "center", fontSize: 12.5, color: FAINT, marginTop: 18 }}>
@@ -737,6 +859,7 @@ function AdminLoginScreen({ go }) {
       <div style={{ textAlign: "center", marginTop: 10, fontSize: 13 }}>
         <a onClick={() => go("login")} style={{ color: MUTED, fontWeight: 700, cursor: "pointer" }}>← Student? Log in here</a>
       </div>
+
     </AuthShell>
   );
 }
@@ -780,8 +903,11 @@ function HeroSection({ children, height = "auto" }) {
    4. STUDENT DASHBOARD
    ========================================================================= */
 
-function StudentDashboard({ go, studentName, assessmentCompleted, myReport }) {
+function StudentDashboard({ go, studentName, myStudent }) {
   const displayName = studentName || "tanvi";
+  const status = myStudent ? myStudent.status : "not_started";
+  const started = status !== "not_started";
+
   return (
     <div style={{ minHeight: "100vh", background: C.cream }} className="qq-fade-in">
       <HeroSection>
@@ -795,6 +921,7 @@ function StudentDashboard({ go, studentName, assessmentCompleted, myReport }) {
             Your personalised assessment adventure starts here. Complete quests to discover your unique strengths!
           </p>
           <StarRating />
+          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 11.5, marginTop: 6 }}>Your curiosity streak — grows as you complete quests</p>
         </div>
       </HeroSection>
       <Wave fill={C.cream} height={56} />
@@ -802,9 +929,9 @@ function StudentDashboard({ go, studentName, assessmentCompleted, myReport }) {
       <div style={{ maxWidth: 880, margin: "-30px auto 0", padding: "0 24px 80px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginBottom: 28 }}>
           {[
-            { label: "Quests Completed", value: assessmentCompleted ? "1" : "–", color: C.yellow },
-            { label: "Subjects Explored", value: assessmentCompleted ? "5" : "–", color: C.sky },
-            { label: "Badges Earned", value: assessmentCompleted ? "3" : "–", color: C.pink },
+            { label: "Quests Completed", value: started ? "1" : "0", color: C.yellow },
+            { label: "Subjects Explored", value: started ? "5" : "0", color: C.sky },
+            { label: "Badges Earned", value: status === "sent" ? "3" : "0", color: C.pink },
           ].map((s) => (
             <div key={s.label} className="qq-card" style={{ padding: "26px 16px", textAlign: "center" }}>
               <div style={{ width: 28, height: 4, background: s.color, borderRadius: 4, margin: "0 auto 14px" }} />
@@ -814,7 +941,7 @@ function StudentDashboard({ go, studentName, assessmentCompleted, myReport }) {
           ))}
         </div>
 
-        {!assessmentCompleted ? (
+        {status === "not_started" && (
           <div className="qq-card" style={{ border: `2.5px dashed ${C.yellow}`, padding: "56px 40px", textAlign: "center" }}>
             <div className="qq-pulse" style={{
               width: 76, height: 76, borderRadius: 20, background: C.yellow, display: "flex",
@@ -828,7 +955,24 @@ function StudentDashboard({ go, studentName, assessmentCompleted, myReport }) {
             </p>
             <PillButton variant="yellow" size="lg" onClick={() => go("assessmentIntro")}>Start a Quest</PillButton>
           </div>
-        ) : (
+        )}
+
+        {status === "submitted" && (
+          <div className="qq-card" style={{ border: `2.5px dashed ${C.yellow}`, padding: "56px 40px", textAlign: "center" }}>
+            <div style={{
+              width: 76, height: 76, borderRadius: 20, background: YELLOW_TINT, display: "flex",
+              alignItems: "center", justifyContent: "center", margin: "0 auto 22px",
+            }}>
+              <CircleEllipsis size={34} color={C.navy} />
+            </div>
+            <div className="qq-heading" style={{ fontSize: 24, color: C.navy, marginBottom: 10 }}>Quest submitted!</div>
+            <p style={{ color: MUTED, maxWidth: 420, margin: "0 auto", fontSize: 14.5 }}>
+              Your report is being reviewed and will appear here once ready.
+            </p>
+          </div>
+        )}
+
+        {status === "sent" && (
           <div className="qq-card" style={{ border: `2.5px dashed ${C.sky}`, padding: "56px 40px", textAlign: "center" }}>
             <div style={{
               width: 76, height: 76, borderRadius: 20, background: SKY_TINT_STRONG, display: "flex",
@@ -903,12 +1047,23 @@ function formatTime(sec) {
   return `${m}:${s}`;
 }
 
-function AssessmentScreen({ go, currentQ, setCurrentQ, answers, setAnswers, timeLeft, setTimeLeft }) {
+function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers, setAnswers, timeLeft, setTimeLeft }) {
   useEffect(() => {
-    if (timeLeft <= 0) { go("submission"); return; }
+    if (timeLeft <= 0) { submitAssessment(); return; }
     const t = setInterval(() => setTimeLeft((s) => Math.max(0, s - 1)), 1000);
     return () => clearInterval(t);
   }, [timeLeft]);
+
+  // Brief "Saved" confirmation whenever an answer changes (skips the very
+  // first render so it doesn't flash when just navigating between questions).
+  const [showSaved, setShowSaved] = useState(false);
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) { mountedRef.current = true; return; }
+    setShowSaved(true);
+    const t = setTimeout(() => setShowSaved(false), 1400);
+    return () => clearTimeout(t);
+  }, [answers]);
 
   const q = QUESTIONS[currentQ];
   const isLast = currentQ === QUESTIONS.length - 1;
@@ -924,12 +1079,18 @@ function AssessmentScreen({ go, currentQ, setCurrentQ, answers, setAnswers, time
   return (
     <div style={{ minHeight: "100vh", background: C.cream, display: "flex", flexDirection: "column" }}>
       {/* top bar */}
-      <div style={{ background: C.white, borderBottom: "1px solid ${BORDER}", padding: "16px 24px" }}>
+      <div style={{ background: C.white, borderBottom: `1px solid ${BORDER}`, padding: "16px 24px" }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <LogoMark size={22} />
               <span style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>Question {currentQ + 1} of {QUESTIONS.length}</span>
+              <span style={{
+                fontSize: 11, fontWeight: 700, color: C.blue, opacity: showSaved ? 1 : 0,
+                transition: "opacity 0.3s ease", display: "flex", alignItems: "center", gap: 4,
+              }}>
+                <Check size={12} /> Saved
+              </span>
             </div>
             <div style={{
               display: "flex", alignItems: "center", gap: 6, fontWeight: 800, fontSize: 14,
@@ -1012,7 +1173,7 @@ function AssessmentScreen({ go, currentQ, setCurrentQ, answers, setAnswers, time
               Back
             </PillButton>
             {isLast ? (
-              <PillButton variant="yellow" onClick={() => go("submission")}>Submit Quest <CheckCircle2 size={16} /></PillButton>
+              <PillButton variant="yellow" onClick={submitAssessment}>Submit Quest <CheckCircle2 size={16} /></PillButton>
             ) : (
               <PillButton variant="navy" onClick={() => setCurrentQ((c) => Math.min(QUESTIONS.length - 1, c + 1))}>
                 Next <ChevronRight size={16} />
@@ -1040,16 +1201,10 @@ function SubmissionScreen({ go }) {
           <CheckCircle2 size={44} color={C.blue} />
         </div>
         <div className="qq-heading" style={{ fontSize: 30, color: C.navy, marginBottom: 10 }}>Quest submitted! 🎉</div>
-        <p style={{ color: MUTED, marginBottom: 22, fontSize: 15 }}>
-          Nice work — you answered all 18 questions. Your Qriosity Map is being put together.
+        <p style={{ color: MUTED, marginBottom: 26, fontSize: 15 }}>
+          Nice work — you answered all 18 questions. Your report is being reviewed and will appear here once ready.
         </p>
-        <MockNote style={{ textAlign: "left", marginBottom: 26 }}>
-          the AI scoring pipeline (Gemini) analyses your 18 answers here to generate trait scores and a personalised letter for your parents. Shown instantly in this prototype.
-        </MockNote>
-        <PillButton variant="navy" size="lg" full onClick={() => go("studentReport")} icon={<MapPin size={16} />}>View My Qriosity Map</PillButton>
-        <div style={{ marginTop: 16 }}>
-          <a onClick={() => go("dashboard")} style={{ fontSize: 13, color: MUTED, cursor: "pointer", fontWeight: 700 }}>Back to dashboard</a>
-        </div>
+        <PillButton variant="navy" size="lg" full onClick={() => go("dashboard")}>Back to Dashboard</PillButton>
       </div>
     </div>
   );
@@ -1061,14 +1216,21 @@ function SubmissionScreen({ go }) {
 
 function TraitBar({ trait, score }) {
   const color = TRAIT_ICON_COLOR[trait];
+  const levelIdx = scoreToLevelIndex(score);
+  const level = LEVELS[levelIdx];
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
         <span style={{ fontSize: 13.5, fontWeight: 700, color: C.navy }}>{trait}</span>
-        <span style={{ fontSize: 13, fontWeight: 700, color }}>{score}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color, background: rgba(color, 0.14), padding: "2px 10px", borderRadius: 999 }}>{level}</span>
       </div>
-      <div style={{ height: 10, background: BORDER, borderRadius: 999, overflow: "hidden" }}>
-        <div style={{ width: `${score}%`, height: "100%", background: color, borderRadius: 999, transition: "width 0.6s ease" }} />
+      <div style={{ display: "flex", gap: 4 }}>
+        {LEVELS.map((_, i) => (
+          <div key={i} style={{
+            flex: 1, height: 10, borderRadius: 999,
+            background: i <= levelIdx ? color : BORDER,
+          }} />
+        ))}
       </div>
       <p style={{ fontSize: 12.5, color: MUTED, marginTop: 6 }}>{TRAIT_BLURBS[trait]}</p>
     </div>
@@ -1076,10 +1238,13 @@ function TraitBar({ trait, score }) {
 }
 
 function QriosityRadar({ scores }) {
+  // Plot by level rank (25/50/75/100), not the raw mock score — keeps the
+  // chart consistent with the qualitative levels shown everywhere else.
+  const levelData = scores.map((s) => ({ trait: s.trait, score: (scoreToLevelIndex(s.score) + 1) * 25 }));
   return (
     <div style={{ width: "100%", height: 300 }}>
       <ResponsiveContainer>
-        <RadarChart data={scores} outerRadius="72%">
+        <RadarChart data={levelData} outerRadius="72%">
           <PolarGrid stroke={BORDER} />
           <PolarAngleAxis dataKey="trait" tick={{ fontSize: 11, fill: C.navy, fontFamily: "Red Hat Display" }} />
           <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
@@ -1090,9 +1255,32 @@ function QriosityRadar({ scores }) {
   );
 }
 
-function StudentReportScreen({ go, studentName, report }) {
+function StudentReportScreen({ go, studentName, myStudent }) {
   const displayName = studentName || "tanvi";
-  const r = report;
+
+  // Reports are admin-gated: only reachable once a report has been approved
+  // ("sent" status). Covers direct dev-nav jumps too, not just the normal flow.
+  if (!myStudent || myStudent.status !== "sent") {
+    return (
+      <div style={{ minHeight: "100vh", background: C.cream, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
+        <Card style={{ textAlign: "center", maxWidth: 440 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 16, background: YELLOW_TINT, display: "flex",
+            alignItems: "center", justifyContent: "center", margin: "0 auto 18px",
+          }}>
+            <CircleEllipsis size={30} color={C.navy} />
+          </div>
+          <div className="qq-heading" style={{ fontSize: 22, color: C.navy, marginBottom: 10 }}>Not ready yet</div>
+          <p style={{ marginBottom: 20, color: MUTED, fontSize: 14.5 }}>
+            Your report is being reviewed and will appear here once it's ready.
+          </p>
+          <PillButton variant="navy" onClick={() => go("dashboard")}>Back to Dashboard</PillButton>
+        </Card>
+      </div>
+    );
+  }
+
+  const r = myStudent;
   return (
     <div style={{ minHeight: "100vh", background: C.cream }} className="qq-fade-in">
       <HeroSection>
@@ -1124,9 +1312,6 @@ function StudentReportScreen({ go, studentName, report }) {
         </Card>
 
         <Card>
-          <div style={{ marginBottom: 16 }}>
-            <MockNote>this report and the letter below were generated by the AI scoring pipeline (Gemini) from the student's 18 answers. Shown here as a saved example.</MockNote>
-          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: SKY_TINT, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Mail size={18} color={C.blue} />
@@ -1138,16 +1323,13 @@ function StudentReportScreen({ go, studentName, report }) {
           </p>
           <div style={{
             background: C.cream, borderRadius: 18, padding: 28, whiteSpace: "pre-wrap",
-            fontSize: 14.5, lineHeight: 1.7, color: C.ink, border: "1px solid ${BORDER}",
+            fontSize: 14.5, lineHeight: 1.7, color: C.ink, border: `1px solid ${BORDER}`,
           }}>
             {r.letter}
           </div>
           <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
             <PillButton variant="outline" icon={<Download size={15} />} onClick={() => {}}>Download Report</PillButton>
             <PillButton variant="navy" onClick={() => go("dashboard")}>Back to Dashboard</PillButton>
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <MockNote>the download button would export this report as a PDF here.</MockNote>
           </div>
         </Card>
       </div>
@@ -1160,11 +1342,25 @@ function StudentReportScreen({ go, studentName, report }) {
    ========================================================================= */
 
 function AdminDashboard({ go, students, selected, setSelected, openReview }) {
-  const allChecked = selected.length === students.length;
-  const someChecked = selected.length > 0 && !allChecked;
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [justSent, setJustSent] = useState(false);
 
-  const toggleAll = () => setSelected(allChecked ? [] : students.map((s) => s.id));
+  const filtered = students.filter((s) => {
+    const matchesSearch = s.name.toLowerCase().includes(search.trim().toLowerCase());
+    const matchesStatus = statusFilter === "all" || s.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const allChecked = filtered.length > 0 && filtered.every((s) => selected.includes(s.id));
+  const someChecked = filtered.some((s) => selected.includes(s.id)) && !allChecked;
+
+  const toggleAll = () => {
+    const filteredIds = filtered.map((s) => s.id);
+    setSelected((sel) => allChecked
+      ? sel.filter((id) => !filteredIds.includes(id))
+      : [...new Set([...sel, ...filteredIds])]);
+  };
   const toggleOne = (id) => setSelected((sel) => sel.includes(id) ? sel.filter((x) => x !== id) : [...sel, id]);
 
   return (
@@ -1179,6 +1375,25 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
       <Wave fill={C.cream} height={48} />
 
       <div style={{ maxWidth: 980, margin: "-20px auto 0", padding: "0 24px 120px" }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+          <div style={{ position: "relative", flex: "1 1 220px" }}>
+            <Search size={16} color={FAINT} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
+            <input
+              className="qq-input"
+              style={{ paddingLeft: 38 }}
+              placeholder="Search by student name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <select className="qq-select" style={{ width: 200, flex: "0 0 auto" }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">All statuses</option>
+            <option value="not_started">Not started</option>
+            <option value="submitted">Submitted</option>
+            <option value="sent">Sent to parents</option>
+          </select>
+        </div>
+
         <Card style={{ padding: 0, overflow: "hidden" }}>
           <div className="qq-scrollhide" style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
@@ -1194,8 +1409,11 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
                 </tr>
               </thead>
               <tbody>
-                {students.map((s) => (
-                  <tr key={s.id} style={{ borderTop: "1px solid ${BORDER}" }}>
+                {filtered.length === 0 && (
+                  <tr><td colSpan={5} style={{ padding: "28px 20px", textAlign: "center", color: FAINT, fontSize: 13.5 }}>No students match your search.</td></tr>
+                )}
+                {filtered.map((s) => (
+                  <tr key={s.id} style={{ borderTop: `1px solid ${BORDER}` }}>
                     <td style={{ padding: "14px 20px" }}>
                       <input type="checkbox" className="qq-checkbox" checked={selected.includes(s.id)} onChange={() => toggleOne(s.id)} />
                     </td>
@@ -1227,31 +1445,30 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
         </div>
       </div>
 
-      {/* sticky send bar */}
-      <div style={{
-        position: "fixed", left: 0, right: 0, bottom: 0, background: C.white,
-        borderTop: "1px solid ${BORDER}", padding: "16px 24px", boxShadow: "0 -10px 30px -18px rgba(0,0,0,0.25)",
-      }}>
-        <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 13.5, color: MUTED, fontWeight: 600 }}>
-            {selected.length === 0 ? "No students selected" : `${selected.length} student${selected.length > 1 ? "s" : ""} selected`}
-            {justSent && <span style={{ color: C.blue, fontWeight: 700, marginLeft: 10 }}>✓ Reports marked as sent (mock)</span>}
-          </span>
-          <PillButton
-            variant="navy"
-            disabled={selected.length === 0}
-            icon={<Send size={15} />}
-            onClick={() => setJustSent(true)}
-          >
-            Send Reports to Selected
-          </PillButton>
-        </div>
-        {selected.length > 0 && (
+      {/* sticky send toolbar — only appears once 1+ students are selected */}
+      {selected.length > 0 && (
+        <div style={{
+          position: "fixed", left: 0, right: 0, bottom: 0, background: C.white,
+          borderTop: `1px solid ${BORDER}`, padding: "16px 24px", boxShadow: "0 -10px 30px -18px rgba(0,0,0,0.25)",
+        }}>
+          <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13.5, color: MUTED, fontWeight: 600 }}>
+              {selected.length} student{selected.length > 1 ? "s" : ""} selected
+              {justSent && <span style={{ color: C.blue, fontWeight: 700, marginLeft: 10 }}>✓ Reports marked as sent (mock)</span>}
+            </span>
+            <PillButton
+              variant="navy"
+              icon={<Send size={15} />}
+              onClick={() => setJustSent(true)}
+            >
+              Send Reports to Selected
+            </PillButton>
+          </div>
           <div style={{ maxWidth: 980, margin: "10px auto 0" }}>
             <MockNote>this triggers an email send (with each student's PDF report) to parents/guardians here.</MockNote>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1260,11 +1477,61 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
    10. REPORT REVIEW (admin)
    ========================================================================= */
 
+/** Collapsible viewer for a student's raw submitted answers — lets an admin
+ *  spot-check the actual MCQ selections / open-text responses before
+ *  approving the generated report, without leaving the review screen. */
+function RawAnswersPanel({ answers }) {
+  const [open, setOpen] = useState(false);
+  if (!answers) return null;
+  return (
+    <Card style={{ marginBottom: 24, padding: 0, overflow: "hidden" }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "22px 32px", background: "none", border: "none", cursor: "pointer",
+          fontFamily: "'Red Hat Display', sans-serif",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <FileText size={18} color={C.blue} />
+          <span className="qq-heading" style={{ fontSize: 20, color: C.navy }}>Raw answers ({answers.length})</span>
+        </div>
+        <ChevronDown size={18} color={MUTED} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }} />
+      </button>
+      {open && (
+        <div style={{ padding: "0 32px 28px", display: "flex", flexDirection: "column", gap: 14 }}>
+          {QUESTIONS.map((q, i) => {
+            const a = answers[i];
+            const sectionColor = SECTION_COLORS[q.section];
+            let answerText;
+            if (!a) answerText = "— no answer recorded —";
+            else if (a.type === "mcq") answerText = a.value == null ? "— not answered —" : q.options[a.value];
+            else answerText = a.value || "— not answered —";
+            return (
+              <div key={i} style={{ borderLeft: `3px solid ${sectionColor}`, paddingLeft: 14 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: MUTED, marginBottom: 3 }}>
+                  Q{i + 1} · {SECTIONS[q.section]} · {q.type === "mcq" ? "MCQ" : "Open text"}
+                </div>
+                <div style={{ fontSize: 13.5, color: C.navy, fontWeight: 600, marginBottom: 4 }}>{q.prompt}</div>
+                <div style={{ fontSize: 13.5, color: C.ink, background: C.cream, borderRadius: 10, padding: "8px 12px" }}>
+                  {answerText}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
   const [editing, setEditing] = useState(false);
   const [letterDraft, setLetterDraft] = useState(student ? student.letter : "");
   const [regenNote, setRegenNote] = useState(false);
   const [approved, setApproved] = useState(false);
+  const [confirmingApprove, setConfirmingApprove] = useState(false);
 
   useEffect(() => { if (student) setLetterDraft(student.letter); }, [student?.id]);
 
@@ -1305,6 +1572,8 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
           </div>
         </Card>
 
+        <RawAnswersPanel answers={student.answers} />
+
         <Card>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div className="qq-heading" style={{ fontSize: 20, color: C.navy }}>Letter to parents</div>
@@ -1325,7 +1594,7 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
           ) : (
             <div style={{
               background: C.cream, borderRadius: 18, padding: 28, whiteSpace: "pre-wrap",
-              fontSize: 14.5, lineHeight: 1.7, color: C.ink, border: "1px solid ${BORDER}",
+              fontSize: 14.5, lineHeight: 1.7, color: C.ink, border: `1px solid ${BORDER}`,
             }}>
               {letterDraft}
             </div>
@@ -1337,23 +1606,45 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
             </div>
           )}
 
-          <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
-            <PillButton
-              variant="sky"
-              icon={<RefreshCw size={15} />}
-              onClick={() => { onRegenerate(student.id); setRegenNote(true); setApproved(false); }}
-            >
-              Regenerate
-            </PillButton>
-            <PillButton
-              variant={approved ? "outline" : "navy"}
-              icon={<Send size={15} />}
-              disabled={approved}
-              onClick={() => { onApprove(student.id); setApproved(true); }}
-            >
-              {approved ? "Approved & Sent ✓" : "Approve & Send"}
-            </PillButton>
-          </div>
+          {!confirmingApprove ? (
+            <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
+              <PillButton
+                variant="sky"
+                icon={<RefreshCw size={15} />}
+                onClick={() => { onRegenerate(student.id); setRegenNote(true); setApproved(false); }}
+              >
+                Regenerate
+              </PillButton>
+              <PillButton
+                variant={approved ? "outline" : "navy"}
+                icon={<Send size={15} />}
+                disabled={approved}
+                onClick={() => setConfirmingApprove(true)}
+              >
+                {approved ? "Approved & Sent ✓" : "Approve & Send"}
+              </PillButton>
+            </div>
+          ) : (
+            <div style={{ marginTop: 24, background: YELLOW_TINT, borderRadius: 16, padding: 20 }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 14 }}>
+                <AlertTriangle size={18} color={C.navy} style={{ flexShrink: 0, marginTop: 1 }} />
+                <div>
+                  <div style={{ fontWeight: 700, color: C.navy, fontSize: 14.5, marginBottom: 2 }}>Send this report to {student.name.split(" ")[0]}'s parent/guardian?</div>
+                  <p style={{ fontSize: 13, color: MUTED, margin: 0 }}>This can't be undone once sent.</p>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 12 }}>
+                <PillButton variant="outline" onClick={() => setConfirmingApprove(false)}>Cancel</PillButton>
+                <PillButton
+                  variant="navy"
+                  icon={<Send size={15} />}
+                  onClick={() => { onApprove(student.id); setApproved(true); setConfirmingApprove(false); }}
+                >
+                  Yes, Approve & Send
+                </PillButton>
+              </div>
+            </div>
+          )}
           {approved && (
             <div style={{ marginTop: 12 }}>
               <MockNote>this marks the report approved and sends the email to the parent/guardian here.</MockNote>
@@ -1390,7 +1681,7 @@ function PipelineColumn({ title, icon, color, students, onOpen, emptyText }) {
             className="qq-card"
             style={{
               padding: "14px 16px", cursor: s.status !== "not_started" ? "pointer" : "default",
-              border: "1px solid ${BORDER}", boxShadow: "0 6px 16px -12px rgba(0,52,104,0.2)",
+              border: `1px solid ${BORDER}`, boxShadow: "0 6px 16px -12px rgba(0,52,104,0.2)",
             }}
           >
             <div style={{ fontWeight: 700, fontSize: 13.5, color: C.ink }}>{s.name}</div>
@@ -1467,30 +1758,47 @@ export default function App() {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(45 * 60);
-  const [assessmentCompleted, setAssessmentCompleted] = useState(false);
 
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [selected, setSelected] = useState([]);
   const [reviewStudentId, setReviewStudentId] = useState(null);
 
-  const myReport = useMemo(() => {
-    const scores = seededScores(studentName || "tanvi");
-    return { scores, letter: generateLetter(studentName || "tanvi", scores) };
-  }, [studentName, assessmentCompleted]);
+  // The logged-in student's own record in the shared roster — this is the
+  // single source of truth for "is my report ready yet" (requirement: a
+  // student's report must not be visible until an admin has approved it).
+  const myStudent = students.find((s) => sameFirstName(s.name, studentName)) || null;
 
   function go(nextScreen, opts = {}) {
     if (opts.studentName) setStudentName(opts.studentName);
-    if (nextScreen === "assessmentIntro" || nextScreen === "assessment") {
-      // fresh attempt
-    }
     if (nextScreen === "assessment" && screen !== "assessment") {
       setCurrentQ(0); setAnswers({}); setTimeLeft(45 * 60);
     }
-    if (nextScreen === "submission") {
-      setAssessmentCompleted(true);
-    }
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     setScreen(nextScreen);
+  }
+
+  // Called from the assessment's "Submit Quest" button. Creates or updates
+  // this student's roster record with status "submitted" (awaiting admin
+  // review) — their report only becomes visible once an admin approves it.
+  function submitAssessment() {
+    const normalized = normalizeAnswers(answers);
+    const name = studentName || "you";
+    const scores = seededScores(name);
+    const letter = generateLetter(name, scores);
+    setStudents((prev) => {
+      const idx = prev.findIndex((s) => sameFirstName(s.name, name));
+      if (idx === -1) {
+        const nextId = prev.length ? Math.max(...prev.map((s) => s.id)) + 1 : 1;
+        return [...prev, {
+          id: nextId, name, email: `${name.toLowerCase().replace(/\s+/g, "")}@edjuvenate.com`,
+          grade: "Grade 6", status: "submitted", scores, letter, answers: normalized,
+        }];
+      }
+      const copy = [...prev];
+      copy[idx] = { ...copy[idx], status: "submitted", scores, letter, answers: normalized };
+      return copy;
+    });
+    go("submission");
   }
 
   function openReview(id) {
@@ -1513,7 +1821,7 @@ export default function App() {
   function resetDemo() {
     setScreen("login");
     setStudentName("tanvi");
-    setCurrentQ(0); setAnswers({}); setTimeLeft(45 * 60); setAssessmentCompleted(false);
+    setCurrentQ(0); setAnswers({}); setTimeLeft(45 * 60);
     setStudents(INITIAL_STUDENTS);
     setSelected([]);
     setReviewStudentId(null);
@@ -1525,18 +1833,19 @@ export default function App() {
   switch (screen) {
     case "signup": ScreenView = <SignupScreen go={go} />; break;
     case "login": ScreenView = <LoginScreen go={go} />; break;
-    case "dashboard": ScreenView = <StudentDashboard go={go} studentName={studentName} assessmentCompleted={assessmentCompleted} myReport={myReport} />; break;
+    case "dashboard": ScreenView = <StudentDashboard go={go} studentName={studentName} myStudent={myStudent} />; break;
     case "assessmentIntro": ScreenView = <AssessmentIntroScreen go={go} />; break;
     case "assessment": ScreenView = (
       <AssessmentScreen
         go={go}
+        submitAssessment={submitAssessment}
         currentQ={currentQ} setCurrentQ={setCurrentQ}
         answers={answers} setAnswers={setAnswers}
         timeLeft={timeLeft} setTimeLeft={setTimeLeft}
       />
     ); break;
     case "submission": ScreenView = <SubmissionScreen go={go} />; break;
-    case "studentReport": ScreenView = <StudentReportScreen go={go} studentName={studentName} report={myReport} />; break;
+    case "studentReport": ScreenView = <StudentReportScreen go={go} studentName={studentName} myStudent={myStudent} />; break;
     case "adminLogin": ScreenView = <AdminLoginScreen go={go} />; break;
     case "adminDashboard": ScreenView = <AdminDashboard go={go} students={students} selected={selected} setSelected={setSelected} openReview={openReview} />; break;
     case "reportReview": ScreenView = <ReportReviewScreen go={go} student={reviewStudent} onApprove={handleApprove} onRegenerate={handleRegenerate} />; break;
