@@ -568,9 +568,9 @@ function makeStudent(id, name, email, grade, status) {
 }
 
 const INITIAL_STUDENTS = [
-  makeStudent(1, "Tanvi Rao", "tanvi@edjuvenate.com", "Grade 6", "submitted"),
+  makeStudent(1, "Tanvi Rao", "tanvi@edjuvenate.com", "Grade 6", "not_started"),
   makeStudent(2, "Aarav Mehta", "aarav.m@edjuvenate.com", "Grade 7", "sent"),
-  makeStudent(3, "Ishita Kapoor", "ishita.k@edjuvenate.com", "Grade 6", "not_started"),
+  makeStudent(3, "Ishita Kapoor", "ishita.k@edjuvenate.com", "Grade 6", "submitted"),
   makeStudent(4, "Rohan Verma", "rohan.v@edjuvenate.com", "Grade 8", "submitted"),
   makeStudent(5, "Sara Ali", "sara.ali@edjuvenate.com", "Grade 7", "sent"),
   makeStudent(6, "Kabir Singh", "kabir.s@edjuvenate.com", "Grade 6", "not_started"),
@@ -794,7 +794,7 @@ function LoginScreen({ go }) {
   const [password, setPassword] = useState("password123");
   return (
     <AuthShell>
-      <AuthHeader pillLabel="Student Login" pillBg={C.sky} pillColor={C.white} title="Welcome back!" emoji="👋" />
+      <AuthHeader pillLabel="Student Login" pillBg={C.sky} pillColor={C.white} title="Let's get exploring!" emoji="👋" />
       <form onSubmit={(e) => { e.preventDefault(); go("dashboard", { studentName: "tanvi" }); }}>
         <Field label="Email address">
           <input className="qq-input" style={{ background: SKY_TINT }} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -829,7 +829,7 @@ function AdminLoginScreen({ go }) {
   const [password, setPassword] = useState("password123");
   return (
     <AuthShell>
-      <AuthHeader pillLabel="Admin Login" pillBg={C.navy} pillColor={C.white} title="Welcome back, Admin" emoji="🔐" />
+      <AuthHeader pillLabel="Admin Login" pillBg={C.navy} pillColor={C.white} title="Welcome Admin" emoji="🔐" />
       <form onSubmit={(e) => { e.preventDefault(); go("adminDashboard"); }}>
         <Field label="Email address">
           <input className="qq-input" style={{ background: SKY_TINT }} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
