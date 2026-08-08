@@ -1696,6 +1696,7 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
             <option value="all">All grades</option>
             {grades.map((g) => <option key={g} value={g}>{g}</option>)}
           </select>
+          <select className="qq-select" style={{ width: 200, flex: "0 0 auto" }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="all">All statuses</option>
             <option value="not_started">Not started</option>
             <option value="submitted">Submitted</option>
@@ -1723,6 +1724,15 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
                 )}
                 {filtered.map((s) => (
                   <tr key={s.id} style={{ borderTop: `1px solid ${BORDER}` }}>
+                    <td style={{ padding: "14px 20px" }}>
+                      <input type="checkbox" className="qq-checkbox" checked={selected.includes(s.id)} onChange={() => toggleOne(s.id)} />
+                    </td>
+                    <td style={{ padding: "14px 8px" }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: C.ink }}>{s.name}</div>
+                      <div style={{ fontSize: 12, color: FAINT }}>{s.email}</div>
+                    </td>
+                    <td style={{ padding: "14px 8px", fontSize: 13.5, color: MUTED }}>{s.grade}</td>
+                    <td style={{ padding: "14px 8px" }}><StatusPill status={s.status} /></td>
                     <td style={{ padding: "14px 20px" }}>
                       <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                         <PillButton
@@ -1961,6 +1971,7 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate, scrollToLett
             </div>
           )}
         </Card>
+        </div>
       </div>
     </div>
   );

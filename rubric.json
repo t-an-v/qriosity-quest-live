@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "rebuilt_from": "Qriosity_Quest_Master_Rubric.pdf",
+    "rebuilt_on": "2026-08-06",
+    "status": "MCQ trait mapping is a content-based reconstruction, not founder-verified except where noted. Level band numeric thresholds are still unconfirmed (see level_bands._todo) - do not ship report scoring until that's resolved.",
+    "confirmed_anchors": "Q1b, Q4b, Q11b, Q12d, Q13e carry forward from the prior rubric.json where a founder-referenced scored example anchored them. Everything else in option_trait_map is [inferred] from matching option text to the trait table in the Master Rubric."
+  },
+  "traits": {
+    "insight_seeking": "The drive to dig until you understand the full picture - asking 'why' and chasing evidence, not just accepting the first answer. Shows up as layered questions, noticing what's missing, connecting facts, wanting the real scientific or logical reason.",
+    "joyful_discovery": "Exploring something purely because it's fun or fascinating - the delight of 'wow, I didn't know that.' Shows up as playful tone, hands-on curiosity, noticing something novel and wanting to poke at it further.",
+    "people_reader": "Curiosity about people - what they're thinking, feeling, or why they acted the way they did. Shows up as empathy, noticing another person's emotions or point of view, asking questions to understand someone.",
+    "bold_engager": "The courage to take the first step into something new or uncertain, rather than waiting to be told what to do. Shows up as proposing action, volunteering an idea out loud, trying something hands-on, persisting after a setback.",
+    "conceptual_innovator": "Comfort with big, abstract, or ambiguous ideas - reimagining how something could work rather than just describing how it does. Shows up as analogies, systems thinking, redesigning something, linking ideas across domains."
+  },
+  "open_ended_scale": {
+    "_note": "Universal 1-4 scale from Master Rubric Section 4. Applies to every open-response trait question. Do NOT use per-question criteria anymore.",
+    "4": "A strong, independent expression of the trait - this is the clearest, most confident version of that trait showing up in the answer.",
+    "3": "A clear expression of the trait, with an obvious next step available to deepen it further.",
+    "2": "The trait is present but underdeveloped, or the student leaned on a different trait instead of the one being measured.",
+    "1": "The trait is largely absent from this particular answer."
+  },
+  "questions": {
+    "1": {
+      "type": "mcq",
+      "prompt": "If you saw tiny water drops on a plant's leaf, like Sara did, what would you most likely do or think next?",
+      "option_trait_map": {
+        "a": "insight_seeking",
+        "b": "people_reader",
+        "c": "bold_engager",
+        "d": "conceptual_innovator",
+        "e": "joyful_discovery"
+      },
+      "confirmed": ["b"],
+      "score_if_selected": 4
+    },
+    "2": {
+      "type": "open",
+      "trait": "joyful_discovery",
+      "prompt": "If you had a plant that could talk, how would you feel about it, what would you ask the plant? Why would you ask those questions?"
+    },
+    "3": {
+      "type": "open",
+      "trait": "people_reader",
+      "prompt": "Imagine Sara is telling her story to you. What are 2-3 questions you could ask to understand the situation better? Why would you ask those questions?"
+    },
+    "4": {
+      "type": "mcq",
+      "prompt": "When you heard Sara's story about the plant with droplets, what part caught your attention the most?",
+      "option_trait_map": {
+        "a": "insight_seeking",
+        "b": "people_reader",
+        "c": "conceptual_innovator",
+        "d": "joyful_discovery",
+        "e": "bold_engager"
+      },
+      "confirmed": ["b"],
+      "score_if_selected": 4
+    },
+    "5": {
+      "type": "open",
+      "trait": "conceptual_innovator",
+      "prompt": "If you could invent something fun or helpful to understand what's going on with plants, what would it be? What would it do?"
+    },
+    "6": {
+      "type": "open",
+      "trait": "insight_seeking",
+      "prompt": "Sara saw water droplets on a leaf and started wondering about them. What kind of 'why' or 'how' question would you ask if you were in her place? What do you think might be the reason behind it?",
+      "_note": "Trait mapping still unconfirmed with founder - carried over from prior rubric.json, was order-based inference not content-verified. Content of the question (chasing a real 'why', wanting the reason) fits insight_seeking well, but flag this one specifically if you get founder time."
+    },
+    "7": {
+      "type": "mcq",
+      "prompt": "If you were trying to understand the leaf mystery better, what would you do first?",
+      "option_trait_map": {
+        "a": "bold_engager",
+        "b": "joyful_discovery",
+        "c": "people_reader",
+        "d": "insight_seeking",
+        "e": "conceptual_innovator"
+      },
+      "confirmed": [],
+      "score_if_selected": 4,
+      "_note": "No confirmed anchor for this question at all (prior rubric.json had every option null here). Whole mapping is [inferred] - highest priority to double check with founder if time allows."
+    },
+    "8": {
+      "type": "open",
+      "trait": "bold_engager",
+      "prompt": "If you were Sara's friend and noticed the leaf mystery too, what step would you take to help solve it?"
+    },
+    "9": {
+      "type": "open",
+      "trait": "joyful_discovery",
+      "prompt": "Have you ever seen a map or chart that surprised you? What did you notice? And what questions came to your mind?"
+    },
+    "10": {
+      "type": "open",
+      "trait": "conceptual_innovator",
+      "prompt": "Imagine you could redesign the river map to include more details about how rivers actually behave. What would you add?"
+    },
+    "11": {
+      "type": "mcq",
+      "prompt": "If you were Imran and saw that the river looked like a string, what would you most likely be curious about?",
+      "option_trait_map": {
+        "a": "bold_engager",
+        "b": "conceptual_innovator",
+        "c": "joyful_discovery",
+        "d": "insight_seeking",
+        "e": "people_reader"
+      },
+      "confirmed": ["b"],
+      "score_if_selected": 4
+    },
+    "12": {
+      "type": "mcq",
+      "prompt": "If you noticed something missing on a map in class, what would you do next?",
+      "option_trait_map": {
+        "a": "people_reader",
+        "b": "insight_seeking",
+        "c": "bold_engager",
+        "d": "conceptual_innovator",
+        "e": "joyful_discovery"
+      },
+      "confirmed": ["d"],
+      "score_if_selected": 4
+    },
+    "13": {
+      "type": "mcq",
+      "prompt": "After Imran asked his question about the river, what would you be most interested in doing or thinking next?",
+      "option_trait_map": {
+        "a": "joyful_discovery",
+        "b": "insight_seeking",
+        "c": "people_reader",
+        "d": "bold_engager",
+        "e": "conceptual_innovator"
+      },
+      "confirmed": ["e"],
+      "score_if_selected": 4
+    },
+    "14": {
+      "type": "open",
+      "trait": "insight_seeking",
+      "prompt": "If you had to ask questions to better understand the rivers of India based on maps, what questions would you ask? And why?"
+    },
+    "15": {
+      "type": "open",
+      "trait": "bold_engager",
+      "prompt": "If you were in that Geography class and also had a question about how rivers are shown on the map, what would you do?"
+    },
+    "16": {
+      "type": "open",
+      "trait": "people_reader",
+      "prompt": "Imagine that Imran didn't say his question out loud, but you noticed he looked puzzled. What would you do, and how would you know something was on his mind?"
+    },
+    "17": {
+      "type": "reflection",
+      "prompt": "What's one question or idea you've had recently about how AI works, or how it should work in the future?",
+      "scored": false,
+      "counts_toward_trait_total": false,
+      "_note": "Per Master Rubric Section 3: not tied to any trait, not graded. Used only to pull a quote for the student's report voice."
+    },
+    "18": {
+      "type": "reflection",
+      "prompt": "If you built an AI tutor for your class, what three abilities would it need to spark genuine curiosity? Explain why each is important.",
+      "scored": false,
+      "counts_toward_trait_total": false,
+      "_note": "Per Master Rubric Section 3: not tied to any trait, not graded. Used only to pull a quote for the student's report voice."
+    }
+  },
+  "trait_levels": {
+    "_todo": "BLOCKED - Master Rubric Section 5 gives these four levels qualitatively only (Emerging/Developing/Demonstrating/Excelling), no numeric thresholds. This is the single most important open question - ask Shubham directly, don't guess. NOTE: prior rubric.json had these mislabeled as dormant/developing/strong/excelling - that naming doesn't match the Master Rubric and has been corrected here, but the % cutoffs below are still just the old unconfirmed hypothesis and should not be trusted.",
+    "emerging": {"meaning": "Rarely shows the trait, even with support.", "range_percent": null},
+    "developing": {"meaning": "Shows the trait with prompts or in some contexts.", "range_percent": null},
+    "demonstrating": {"meaning": "Shows the trait independently, across situations.", "range_percent": null},
+    "excelling": {"meaning": "Shows the trait consistently, and inspires it in others.", "range_percent": null}
+  }
+}
