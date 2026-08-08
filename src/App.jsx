@@ -228,6 +228,12 @@ function GlobalStyle() {
         border-width: 0 2px 2px 0;
         transform: rotate(45deg) translate(-1px,-1px);
       }
+      .qq-chip-pop { animation: qqChipPop 0.32s ease; }
+      @keyframes qqChipPop {
+        0% { transform: scale(0.7); }
+        55% { transform: scale(1.18); }
+        100% { transform: scale(1); }
+      }
 
       textarea.qq-input { resize: vertical; min-height: 96px; line-height: 1.5; }
 
@@ -459,9 +465,68 @@ function scoreToLevel(score) {
 const SECTIONS = ["You And Your Thoughts", "You And The People Around You", "You And The World"];
 const SECTION_COLORS = [C.yellow, C.sky, C.pink];
 
-// Each section opens with a short story the student reads before answering
-// that section's questions — shown once, above the first question of the
-// section (see SECTION_STORIES + AssessmentScreen).
+const QUESTIONS = [
+  // Section A — 8 questions
+  { section: 0, type: "mcq", prompt: "If you saw tiny water drops on a plant's leaf, like Sara did, what would you most likely do or think next?", options: [
+    "Why does this happen? What's the science behind it?",
+    "What if I create a notebook to track where & when it happens?",
+    "I should ask someone about this or try to check it myself.",
+    "Is the plant okay? What would it say if it could talk?",
+    "Cool! Let me try this with another plant to see if the same thing happens.",
+  ] },
+  { section: 0, type: "text", prompt: "If you had a plant that could talk, how would you feel about it, what would you ask the plant? Why would you ask those questions?" },
+  { section: 0, type: "text", prompt: "Imagine Sara is telling her story to you. What are 2–3 questions you could ask to understand the situation better? Why would you ask those questions?" },
+  { section: 0, type: "mcq", prompt: "When you heard Sara's story about the plant with droplets, what part caught your attention the most?", options: [
+    "The fact that something so small made her ask a big question.",
+    "That she turned it into a fun mystery, almost like a game.",
+    "That she thought about tracking patterns & making sense of them herself.",
+    "That she imagined the plant sweating and made it feel like a person.",
+    "That she didn't wait for class but started testing ideas at home.",
+  ] },
+  { section: 0, type: "text", prompt: "If you could invent something fun or helpful to understand what's going on with plants, what would it be? What would it do?" },
+  { section: 0, type: "text", prompt: "Sara saw water droplets on a leaf and started wondering about them. What kind of 'why' or 'how' question would you ask if you were in her place? What do you think might be the reason behind it?" },
+  { section: 0, type: "mcq", prompt: "If you were trying to understand the leaf mystery better, what would you do first?", options: [
+    "Raise the question in class to the teacher or to someone at home.",
+    "Read more about how water moves through plants.",
+    "Ask others what they think is going on and discuss it with friends.",
+    "Look at different plants and compare which ones have water on their leaves.",
+    "Design an experiment to test how different environments affect the droplets.",
+  ] },
+  { section: 0, type: "text", prompt: "If you were Sara's friend & noticed the leaf mystery too, what step would you take to help solve it? Would you ask a question in class, try an experiment at home, or share your guess out loud?" },
+
+  // Section B — 8 questions
+  { section: 1, type: "text", prompt: "Have you ever seen a map or chart that surprised you and made you think, \u201cWait — is that how it really looks!\u201d? What did you notice? And what questions came to your mind?" },
+  { section: 1, type: "text", prompt: "Imagine you could redesign the river map to include more details about how rivers actually behave. What would you add to make it more complete or interesting?" },
+  { section: 1, type: "mcq", prompt: "After Imran asked his question about the river, what would you be most interested in doing or thinking next?", options: [
+    "I'd look through the atlas or globe to compare how other rivers are shown.",
+    "I'd raise my hand and ask another question or share my thoughts.",
+    "I'd look around to see if others were confused or thinking the same thing.",
+    "I'd try to understand how mapmakers decide what to include or leave out.",
+    "I'd sketch a new kind of river map that includes tributaries, width, and movement.",
+  ] },
+  { section: 1, type: "mcq", prompt: "If you were Imran & saw that the river looked like a string, what would you most likely be curious about?", options: [
+    "I would speak up or ask the teacher about what else the map could tell us.",
+    "What parts of the river are missing from this map?",
+    "Can I find a different map that shows the river in more detail?",
+    "Maybe I can draw or design a map that shows the river more realistically.",
+    "I wonder if other students also noticed this or felt confused.",
+  ] },
+  { section: 1, type: "mcq", prompt: "If you noticed something missing on a map in class, what would you do next?", options: [
+    "Discuss with a friend & look for answers together.",
+    "Sketch an improved version of the map in my notebook.",
+    "Raise the point in class or ask the teacher directly.",
+    "Try to understand what the map is actually trying to show.",
+    "Compare it with another source, like an atlas or globe.",
+  ] },
+  { section: 1, type: "text", prompt: "If you had to ask questions to better understand the rivers of India based on maps, what questions would you ask? And why would you ask them?" },
+  { section: 1, type: "text", prompt: "If you were in that Geography class and also had a question about how rivers are shown on the map, what would you do? Would you ask your teacher, try to find the answer by discussing with your friends, or try to find the answer yourself?" },
+  { section: 1, type: "text", prompt: "Imagine that Imran didn't say his question out loud, but you noticed he looked puzzled while staring at the map. What would you do, and how would you know something was on his mind?" },
+
+  // Section C — 2 questions, reflection (not trait-scored)
+  { section: 2, type: "text", prompt: "What's one question, or idea you've had recently about how AI works, or how it should work in the future? Explain briefly in your own words." },
+  { section: 2, type: "text", prompt: "If you built an AI tutor for your class, what three abilities would it need to spark genuine curiosity? Explain why each is important." },
+];
+
 const SECTION_STORIES = [
   {
     title: "\u201cSara and the Sweaty Leaf\u201d",
@@ -471,35 +536,33 @@ Her friend giggled, \u201cMaybe it\u2019s nervous about being in school.\u201d
 
 Sara laughed too, but her mind kept spinning. \u201cCan plants feel hot? Why would they have water on them if no one watered them?\u201d
 
-Later on in the class, her teacher introduced her to the topic of \u201ctranspiration\u201d and about how plants lose water through their leaves in the process, and it clicked. She thought to herself, \u201cSo that\u2019s what it is!\u201d
+Later on in the class, her teacher introduced her to the topic of \u201ctranspiration\u201d and about how plants lose water through their leaves in the process, and it clicked. She thought to herself, \u201cSo that's what it is!\u201d
 
-That evening, while brushing her teeth, she had an idea: \u201cMaybe I\u2019ll leave two plants in different places and see what happens.\u201d She grabbed her notebook and wrote down: Leaf water mystery \u2014 the transpiration trial.`,
+That evening, while brushing her teeth, she had an idea: \u201cMaybe I'll leave two plants in different places and see what happens.\u201d She grabbed her notebook and wrote down: Leaf water mystery \u2014 the transpiration trial.`,
   },
   {
     title: "\u201cThe Wiggly Blue Line\u201d",
     body: `It was a quiet afternoon in Geography class. The teacher rolled down the wall map of India and pointed to several blue lines criss-crossing the country.
 
-\u201cToday, we\u2019ll explore the Rivers of India,\u201d she said. \u201cThis one is the Ganga, flowing from the Himalayas all the way to the Bay of Bengal. Over here\u2019s the Yamuna, and this is the Brahmaputra, which enters India from Arunachal Pradesh.\u201d
+\u201cToday, we'll explore the Rivers of India,\u201d she said. \u201cThis one is the Ganga, flowing from the Himalayas all the way to the Bay of Bengal. Over here's the Yamuna, and this is the Brahmaputra, which enters India from Arunachal Pradesh.\u201d
 
 The students leaned forward. \u201cWhy are they all so thin?\u201d asked Anjali. \u201cThey look like blue threads.\u201d
 
-Imran raised his hand. \u201cMa\u2019am, rivers are huge and they branch out \u2014 why are they shown as just single lines?\u201d
+Imran raised his hand. \u201cMa'am, rivers are huge and they branch out \u2014 why are they shown as just single lines?\u201d
 
-The teacher nodded. \u201cExcellent question, Imran. On maps, rivers are shown using symbols & simplified lines. That\u2019s because maps are made to show lots of information in a small space. This map shows the main course of each river, but it doesn\u2019t show the small streams, distributaries, or how wide they are.\u201d
-
-She drew a small sketch on the board. \u201cThe Ganga, for example, has many tributaries like the Gandak and Ghaghara, and forms a massive delta with the Brahmaputra. But that complexity can\u2019t all fit here.\u201d
+The teacher nodded. \u201cExcellent question, Imran. On maps, rivers are shown using symbols & simplified lines. That's because maps are made to show lots of information in a small space.\u201d
 
 She paused. \u201cSo, maps help us learn where rivers flow, but we also need to ask \u2014 what do they leave out?\u201d
 
-Suddenly, the wiggly blue lines didn\u2019t seem so simple anymore.`,
+Suddenly, the wiggly blue lines didn't seem so simple anymore.`,
   },
   {
     title: "\u201cNewsroom Shuffle\u201d",
-    body: `Last week, Class 8A was taken to the AV room to watch a news bulletin. But this time, the anchor wasn\u2019t a person \u2014 it was an AI: a glowing screen with a computer voice that said, \u201cGood evening. Here is your news update.\u201d
+    body: `Last week, Class 8A was taken to the AV room to watch a news bulletin. But this time, the anchor wasn't a person \u2014 it was an AI: a glowing screen with a computer voice that said, \u201cGood evening. Here is your news update.\u201d
 
 It showed flood alerts, cricket scores, and even a story about a school winning a science award \u2014 all without mistakes, pauses, or expressions.
 
-Some students clapped. \u201cIt\u2019s fast and perfect!\u201d said one. But Ranya frowned. \u201cIt didn\u2019t even pause during the sad news. It just\u2026 kept going like a robot.\u201d
+Some students clapped. \u201cIt's fast and perfect!\u201d said one. But Ranya frowned. \u201cIt didn't even pause during the sad news. It just\u2026 kept going like a robot.\u201d
 
 Later, the teacher asked, \u201cWhat should news do \u2014 just give facts, or help us feel and think too?\u201d
 
@@ -507,70 +570,20 @@ The room went quiet. Then the debates began.`,
   },
 ];
 
-// The real Qriosity Quest question paper (edjuvenate.com) — 18 questions,
-// Section A: 8 questions (3 MCQ + 5 open text), Section B: 8 questions
-// (3 MCQ + 5 open text), Section C: 2 open-text questions. Left verbatim.
-const QUESTIONS = [
-  // Section A — You And Your Thoughts (story: "Sara and the Sweaty Leaf")
-  { section: 0, type: "mcq", prompt: "If you saw tiny water drops on a plant\u2019s leaf, like Sara did, what would you most likely do or think next?", options: [
-    "Why does this happen? What\u2019s the science behind it?",
-    "Is the plant okay? What would it say if it could talk?",
-    "I should ask someone about this or try to check it myself.",
-    "What if I create a notebook to track where & when it happens?",
-    "Cool! Let me try this with another plant to see if the same thing happens.",
-  ] },
-  { section: 0, type: "text", prompt: "If you had a plant that could talk, how would you feel about it, what would you ask the plant? Why would you ask those questions?" },
-  { section: 0, type: "text", prompt: "Imagine Sara is telling her story to you. What are 2\u20133 questions you could ask to understand the situation better? Why would you ask those questions?" },
-  { section: 0, type: "mcq", prompt: "When you heard Sara\u2019s story about the plant with droplets, what part caught your attention the most?", options: [
-    "The fact that something so small made her ask a big question.",
-    "That she imagined the plant sweating and made it feel like a person.",
-    "That she thought about tracking patterns & making sense of them herself.",
-    "That she turned it into a fun mystery, almost like a game.",
-    "That she didn\u2019t wait for class but started testing ideas at home.",
-  ] },
-  { section: 0, type: "text", prompt: "If you could invent something fun or helpful to understand what\u2019s going on with plants, what would it be? What would it do?" },
-  { section: 0, type: "text", prompt: "Sara saw water droplets on a leaf and started wondering about them. What kind of \u2018why\u2019 or \u2018how\u2019 question would you ask if you were in her place? What do you think might be the reason behind it?" },
-  { section: 0, type: "mcq", prompt: "If you were trying to understand the leaf mystery better, what would you do first?", options: [
-    "Raise the question in class to the teacher or to someone at home.",
-    "Look at different plants and compare which ones have water on their leaves.",
-    "Ask others what they think is going on and discuss it with friends.",
-    "Read more about how water moves through plants.",
-    "Design an experiment to test how different environments affect the droplets.",
-  ] },
-  { section: 0, type: "text", prompt: "If you were Sara\u2019s friend & noticed the leaf mystery too, what step would you take to help solve it? Would you ask a question in class, try an experiment at home, or share your guess out loud?" },
-
-  // Section B — You And The People Around You (story: "The Wiggly Blue Line")
-  { section: 1, type: "text", prompt: "Have you ever seen a map or chart that surprised you and made you think, \u201cWait \u2014 is that how it really looks!\u201d? What did you notice? And what questions came to your mind?" },
-  { section: 1, type: "text", prompt: "Imagine you could redesign the river map to include more details about how rivers actually behave. What would you add to make it more complete or interesting?" },
-  { section: 1, type: "mcq", prompt: "If you were Imran & saw that the river looked like a string, what would you most likely be curious about?", options: [
-    "I would speak up or ask the teacher about what else the map could tell us.",
-    "Maybe I can draw or design a map that shows the river more realistically.",
-    "Can I find a different map that shows the river in more detail?",
-    "What parts of the river are missing from this map?",
-    "I wonder if other students also noticed this or felt confused.",
-  ] },
-  { section: 1, type: "mcq", prompt: "If you noticed something missing on a map in class, what would you do next?", options: [
-    "Discuss with a friend & look for answers together.",
-    "Try to understand what the map is actually trying to show.",
-    "Raise the point in class or ask the teacher directly.",
-    "Sketch an improved version of the map in my notebook.",
-    "Compare it with another source, like an atlas or globe.",
-  ] },
-  { section: 1, type: "mcq", prompt: "After Imran asked his question about the river, what would you be most interested in doing or thinking next?", options: [
-    "I\u2019d look through the atlas or globe to compare how other rivers are shown.",
-    "I\u2019d try to understand how mapmakers decide what to include or leave out.",
-    "I\u2019d look around to see if others were confused or thinking the same thing.",
-    "I\u2019d raise my hand and ask another question or share my thoughts.",
-    "I\u2019d sketch a new kind of river map that includes tributaries, width, and movement.",
-  ] },
-  { section: 1, type: "text", prompt: "If you had to ask questions to better understand the rivers of India based on maps, what questions would you ask? And why would you ask them?" },
-  { section: 1, type: "text", prompt: "If you were in that Geography class and also had a question about how rivers are shown on the map, what would you do? Would you ask your teacher, try to find the answer by discussing with your friends, or try to find the answer yourself?" },
-  { section: 1, type: "text", prompt: "Imagine that Imran didn\u2019t say his question out loud, but you noticed he looked puzzled while staring at the map. What would you do, and how would you know something was on his mind?" },
-
-  // Section C — You And The World (story: "Newsroom Shuffle")
-  { section: 2, type: "text", prompt: "What\u2019s one question, or idea you\u2019ve had recently about how AI works, or how it should work in the future? Explain briefly in your own words." },
-  { section: 2, type: "text", prompt: "If you built an AI tutor for your class, what three abilities would it need to spark genuine curiosity? Explain why each is important." },
-];
+const ARCHETYPES = {
+  "Insight Seeking": "The Insight Seeker",
+  "Joyful Discovery": "The Joyful Explorer",
+  "People Reader": "The People Reader",
+  "Bold Engager": "The Bold Engager",
+  "Conceptual Innovator": "The Conceptual Innovator",
+};
+const GROWTH_NUDGE = {
+  "Insight Seeking": "Next step: try asking one more \u201cwhy\u201d before settling on an answer.",
+  "Joyful Discovery": "Next step: give yourself permission to explore something just because it's fun.",
+  "People Reader": "Next step: notice one thing about how a friend is feeling today.",
+  "Bold Engager": "Next step: be the first to try an idea out loud, even if it's not perfect.",
+  "Conceptual Innovator": "Next step: sketch out one wild \u201cwhat if\u201d idea, no matter how big.",
+};
 
 function seededScores(seed) {
   let h = 0;
@@ -642,6 +655,14 @@ The Qriosity Quest Team`;
 function sameFirstName(a, b) {
   if (!a || !b) return false;
   return a.trim().split(" ")[0].toLowerCase() === b.trim().split(" ")[0].toLowerCase();
+}
+
+function seededTimeAgo(seed, kind) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 97;
+  const days = 1 + (h % 9);
+  const label = kind === "sent" ? "Sent" : "Submitted";
+  return `${label} ${days} day${days > 1 ? "s" : ""} ago`;
 }
 
 function makeStudent(id, name, email, grade, status) {
@@ -1074,8 +1095,27 @@ function StudentDashboard({ go, studentName, myStudent }) {
             <p style={{ color: MUTED, maxWidth: 420, margin: "0 auto 26px", fontSize: 14.5 }}>
               Your Qriosity Map is ready — here's what we discovered about how you think and learn.
             </p>
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <PillButton variant="navy" size="lg" onClick={() => go("studentReport")} icon={<MapPin size={16} />}>View My Qriosity Map</PillButton>
+            <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+              <div style={{ position: "relative", flex: "1 1 220px" }}>
+                <Search size={16} color={FAINT} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
+                <input
+                  className="qq-input"
+                  style={{ paddingLeft: 38 }}
+                  placeholder="Search by student name..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <select className="qq-select" style={{ width: 160, flex: "0 0 auto" }} value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
+                <option value="all">All grades</option>
+                {grades.map((g) => <option key={g} value={g}>{g}</option>)}
+              </select>
+              <select className="qq-select" style={{ width: 200, flex: "0 0 auto" }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <option value="all">All statuses</option>
+                <option value="not_started">Not started</option>
+                <option value="submitted">Submitted</option>
+                <option value="sent">Sent to parents</option>
+              </select>
             </div>
           </div>
         )}
@@ -1095,6 +1135,7 @@ function AssessmentIntroScreen({ go }) {
     "Don't try to impress — try to express",
     "Let your instincts guide you",
     "Your imagination is your best tool",
+    "If your connection drops or you close the tab, your answers so far are saved — just log back in to continue.",
   ];
   const sections = [
     { name: "Section A", title: "You And Your Thoughts", hook: "What makes your brain buzz with questions?" },
@@ -1244,6 +1285,7 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
               </div>
             ))}
           </div>
+          <QuestPath questions={QUESTIONS} answers={answers} currentQ={currentQ} onJump={setCurrentQ} />
         </div>
       </div>
 
@@ -1338,6 +1380,79 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function QuestPathChip({ index, isCurrent, isAnswered, sectionColor, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Go to question ${index + 1}`}
+      className={isAnswered ? "qq-chip-pop" : undefined}
+      style={{
+        width: isCurrent ? 34 : 28,
+        height: isCurrent ? 34 : 28,
+        borderRadius: "40% 60% 55% 45% / 50% 45% 55% 50%", // slightly irregular "pill/blob"
+        border: isAnswered || isCurrent ? "none" : `2px solid ${BORDER_STRONG}`,
+        background: isCurrent ? C.navy : isAnswered ? sectionColor : C.white,
+        color: isCurrent ? C.white : isAnswered ? (sectionColor === C.yellow ? C.navy : C.white) : MUTED,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 12, fontWeight: 800, cursor: "pointer", flexShrink: 0,
+        transition: "transform 0.18s ease, box-shadow 0.18s ease",
+        transform: isCurrent ? "scale(1.05)" : "scale(1)",
+        boxShadow: isCurrent ? `0 0 0 4px ${rgba(C.navy, 0.18)}, 0 6px 14px -6px rgba(0,52,104,0.4)` : "none",
+        fontFamily: "'Red Hat Display', sans-serif",
+      }}
+    >
+      {isAnswered && !isCurrent ? <Check size={13} /> : index + 1}
+    </button>
+  );
+}
+
+function QuestPath({ questions, answers, currentQ, onJump }) {
+  const [open, setOpen] = useState(false);
+  const answeredCount = questions.filter((_, i) => {
+    const a = answers[i];
+    return typeof a === "number" || (typeof a === "string" && a.trim().length > 0);
+  }).length;
+
+  return (
+    <div style={{ marginTop: 10 }}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          background: "none", border: "none", cursor: "pointer", padding: "4px 0",
+          display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: C.blue,
+          fontFamily: "'Red Hat Display', sans-serif",
+        }}
+      >
+        <Compass size={13} />
+        Your quest path ({answeredCount}/{questions.length})
+        <ChevronDown size={13} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }} />
+      </button>
+      {open && (
+        <div className="qq-fade-in qq-scrollhide" style={{
+          display: "flex", gap: 8, flexWrap: "wrap", padding: "12px 4px 4px",
+        }}>
+          {questions.map((q, i) => {
+            const a = answers[i];
+            const isAnswered = typeof a === "number" || (typeof a === "string" && a.trim().length > 0);
+            return (
+              <QuestPathChip
+                key={i}
+                index={i}
+                isCurrent={i === currentQ}
+                isAnswered={isAnswered}
+                sectionColor={SECTION_COLORS[q.section]}
+                onClick={() => onJump(i)}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -1477,6 +1592,9 @@ function StudentReportScreen({ go, studentName, myStudent }) {
           <p style={{ fontSize: 12.5, color: MUTED, marginBottom: 16 }}>
             Since parents don't have separate logins, their letter appears right here on your dashboard.
           </p>
+          <p style={{ fontSize: 13, color: MUTED, marginBottom: 12, fontStyle: "italic" }}>
+            Here's the letter we're sending your parents — take a look before they do!
+          </p>
           <div style={{
             background: C.cream, borderRadius: 18, padding: 28, whiteSpace: "pre-wrap",
             fontSize: 14.5, lineHeight: 1.7, color: C.ink, border: `1px solid ${BORDER}`,
@@ -1501,11 +1619,14 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [justSent, setJustSent] = useState(false);
+  const [gradeFilter, setGradeFilter] = useState("all");
+  const grades = [...new Set(students.map((s) => s.grade))];
 
   const filtered = students.filter((s) => {
     const matchesSearch = s.name.toLowerCase().includes(search.trim().toLowerCase());
     const matchesStatus = statusFilter === "all" || s.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesGrade = gradeFilter === "all" || s.grade === gradeFilter;
+    return matchesSearch && matchesStatus && matchesGrade;
   });
 
   const allChecked = filtered.length > 0 && filtered.every((s) => selected.includes(s.id));
@@ -1529,8 +1650,37 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
         </div>
       </HeroSection>
       <Wave fill={C.cream} height={48} />
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: "20px 24px 0" }}>
+        <AdminTabBar current="adminDashboard" go={go} />
+      </div>
 
       <div style={{ maxWidth: 980, margin: "-20px auto 0", padding: "0 24px 120px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <span style={{ fontSize: 12.5, color: MUTED, fontWeight: 600 }}>
+            Showing {filtered.length} of {students.length} students
+          </span>
+        </div>
+
+        {selected.length > 0 && (
+          <div className="qq-card qq-fade-in" style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap",
+            padding: "14px 20px", marginBottom: 14, border: `1.5px solid ${C.navy}`,
+          }}>
+            <span style={{ fontSize: 13.5, color: C.navy, fontWeight: 700 }}>
+              {selected.length} student{selected.length > 1 ? "s" : ""} selected
+              {justSent && <span style={{ color: C.blue, fontWeight: 700, marginLeft: 10 }}>✓ Reports marked as sent (mock)</span>}
+            </span>
+            <PillButton variant="navy" size="sm" icon={<Send size={15} />} onClick={() => setJustSent(true)}>
+              Send Reports to Selected
+            </PillButton>
+          </div>
+        )}
+        {selected.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <MockNote>this triggers an email send (with each student's PDF report) to parents/guardians here.</MockNote>
+          </div>
+        )}
+
         <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: "1 1 220px" }}>
             <Search size={16} color={FAINT} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
@@ -1542,7 +1692,10 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <select className="qq-select" style={{ width: 200, flex: "0 0 auto" }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select className="qq-select" style={{ width: 160, flex: "0 0 auto" }} value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
+            <option value="all">All grades</option>
+            {grades.map((g) => <option key={g} value={g}>{g}</option>)}
+          </select>
             <option value="all">All statuses</option>
             <option value="not_started">Not started</option>
             <option value="submitted">Submitted</option>
@@ -1571,23 +1724,30 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
                 {filtered.map((s) => (
                   <tr key={s.id} style={{ borderTop: `1px solid ${BORDER}` }}>
                     <td style={{ padding: "14px 20px" }}>
-                      <input type="checkbox" className="qq-checkbox" checked={selected.includes(s.id)} onChange={() => toggleOne(s.id)} />
-                    </td>
-                    <td style={{ padding: "14px 8px" }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: C.ink }}>{s.name}</div>
-                      <div style={{ fontSize: 12, color: FAINT }}>{s.email}</div>
-                    </td>
-                    <td style={{ padding: "14px 8px", fontSize: 13.5, color: MUTED }}>{s.grade}</td>
-                    <td style={{ padding: "14px 8px" }}><StatusPill status={s.status} /></td>
-                    <td style={{ padding: "14px 20px" }}>
-                      <PillButton
-                        size="sm"
-                        variant={s.status === "not_started" ? "outline" : "navy"}
-                        disabled={s.status === "not_started"}
-                        onClick={() => openReview(s.id)}
-                      >
-                        View Report
-                      </PillButton>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <PillButton
+                          size="sm"
+                          variant={s.status === "not_started" ? "outline" : "navy"}
+                          disabled={s.status === "not_started"}
+                          onClick={() => openReview(s.id)}
+                        >
+                          View Report
+                        </PillButton>
+                        <button
+                          type="button"
+                          aria-label="Jump to letter to parents"
+                          disabled={s.status === "not_started"}
+                          onClick={() => openReview(s.id, { scrollToLetter: true })}
+                          style={{
+                            width: 34, height: 34, borderRadius: 10, border: `1.5px solid ${BORDER}`,
+                            background: C.white, cursor: s.status === "not_started" ? "not-allowed" : "pointer",
+                            opacity: s.status === "not_started" ? 0.4 : 1,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                          }}
+                        >
+                          <Mail size={14} color={C.blue} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -1601,30 +1761,15 @@ function AdminDashboard({ go, students, selected, setSelected, openReview }) {
         </div>
       </div>
 
-      {/* sticky send toolbar — only appears once 1+ students are selected */}
-      {selected.length > 0 && (
-        <div style={{
-          position: "fixed", left: 0, right: 0, bottom: 0, background: C.white,
-          borderTop: `1px solid ${BORDER}`, padding: "16px 24px", boxShadow: "0 -10px 30px -18px rgba(0,0,0,0.25)",
-        }}>
-          <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 13.5, color: MUTED, fontWeight: 600 }}>
-              {selected.length} student{selected.length > 1 ? "s" : ""} selected
-              {justSent && <span style={{ color: C.blue, fontWeight: 700, marginLeft: 10 }}>✓ Reports marked as sent (mock)</span>}
-            </span>
-            <PillButton
-              variant="navy"
-              icon={<Send size={15} />}
-              onClick={() => setJustSent(true)}
-            >
-              Send Reports to Selected
-            </PillButton>
-          </div>
-          <div style={{ maxWidth: 980, margin: "10px auto 0" }}>
-            <MockNote>this triggers an email send (with each student's PDF report) to parents/guardians here.</MockNote>
-          </div>
-        </div>
-      )}
+    </div>
+  );
+}
+
+function AdminTabBar({ current, go }) {
+  return (
+    <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+      <PillButton size="sm" variant={current === "adminDashboard" ? "navy" : "outline"} icon={<Users size={13} />} onClick={() => go("adminDashboard")}>Students</PillButton>
+      <PillButton size="sm" variant={current === "pipeline" ? "navy" : "outline"} icon={<ShieldCheck size={13} />} onClick={() => go("pipeline")}>Pipeline</PillButton>
     </div>
   );
 }
@@ -1682,7 +1827,7 @@ function RawAnswersPanel({ answers }) {
   );
 }
 
-function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
+function ReportReviewScreen({ go, student, onApprove, onRegenerate, scrollToLetter }) {
   const [editing, setEditing] = useState(false);
   const [letterDraft, setLetterDraft] = useState(student ? student.letter : "");
   const [regenNote, setRegenNote] = useState(false);
@@ -1690,6 +1835,13 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
   const [confirmingApprove, setConfirmingApprove] = useState(false);
 
   useEffect(() => { if (student) setLetterDraft(student.letter); }, [student?.id]);
+
+  const letterRef = useRef(null);
+  useEffect(() => {
+    if (scrollToLetter && letterRef.current) {
+      letterRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [scrollToLetter, student?.id]);
 
   if (!student) {
     return (
@@ -1713,6 +1865,7 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
         </div>
       </HeroSection>
       <Wave fill={C.cream} height={48} />
+      <AdminTabBar current="adminDashboard" go={go} />
 
       <div style={{ maxWidth: 880, margin: "-20px auto 0", padding: "0 24px 80px" }}>
         <Card style={{ marginBottom: 24 }}>
@@ -1730,6 +1883,7 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
 
         <RawAnswersPanel answers={student.answers} />
 
+        <div ref={letterRef}>
         <Card>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div className="qq-heading" style={{ fontSize: 20, color: C.navy }}>Letter to parents</div>
@@ -1816,7 +1970,8 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate }) {
    11. PIPELINE / SUBMISSIONS OVERVIEW
    ========================================================================= */
 
-function PipelineColumn({ title, icon, color, students, onOpen, emptyText }) {
+function PipelineColumn({ title, icon, color, students, onOpen, emptyText, clickable, timestampKind }) {
+  const [hoveredId, setHoveredId] = useState(null);
   return (
     <div style={{ flex: 1, minWidth: 240 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -1830,20 +1985,41 @@ function PipelineColumn({ title, icon, color, students, onOpen, emptyText }) {
         {students.length === 0 && (
           <div style={{ fontSize: 12.5, color: FAINT, fontStyle: "italic", padding: "10px 4px" }}>{emptyText}</div>
         )}
-        {students.map((s) => (
-          <div
-            key={s.id}
-            onClick={() => s.status !== "not_started" && onOpen(s.id)}
-            className="qq-card"
-            style={{
-              padding: "14px 16px", cursor: s.status !== "not_started" ? "pointer" : "default",
-              border: `1px solid ${BORDER}`, boxShadow: "0 6px 16px -12px rgba(0,52,104,0.2)",
-            }}
-          >
-            <div style={{ fontWeight: 700, fontSize: 13.5, color: C.ink }}>{s.name}</div>
-            <div style={{ fontSize: 11.5, color: FAINT }}>{s.grade}</div>
-          </div>
-        ))}
+        {students.map((s) => {
+          const hovered = hoveredId === s.id;
+          return (
+            <div
+              key={s.id}
+              onClick={() => clickable && onOpen(s.id)}
+              onMouseEnter={() => setHoveredId(s.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              className="qq-card"
+              style={{
+                padding: "14px 16px", cursor: clickable ? "pointer" : "default",
+                border: `1px solid ${BORDER}`,
+                boxShadow: hovered && clickable ? "0 14px 28px -14px rgba(0,52,104,0.35)" : "0 6px 16px -12px rgba(0,52,104,0.2)",
+                transform: hovered && clickable ? "translateY(-2px)" : "none",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 13.5, color: C.ink }}>{s.name}</div>
+                <div style={{ fontSize: 11.5, color: FAINT }}>{s.grade}</div>
+                {timestampKind && (
+                  <div style={{ fontSize: 11, color: MUTED, marginTop: 3 }}>{seededTimeAgo(s.name, timestampKind)}</div>
+                )}
+              </div>
+              {clickable && (
+                <ChevronRight
+                  size={16}
+                  color={C.blue}
+                  style={{ opacity: hovered ? 1 : 0, transition: "opacity 0.15s ease", flexShrink: 0 }}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -1865,6 +2041,10 @@ function PipelineScreen({ go, students, openReview }) {
       </HeroSection>
       <Wave fill={C.cream} height={48} />
 
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: "20px 24px 0" }}>
+        <AdminTabBar current="pipeline" go={go} />
+      </div>
+
       <div style={{ maxWidth: 980, margin: "-20px auto 0", padding: "0 24px 80px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }} className="qq-report-grid">
           {[
@@ -1884,14 +2064,17 @@ function PipelineScreen({ go, students, openReview }) {
             <PipelineColumn
               title="Not started" color={SURFACE_2} icon={<CircleDashed size={16} color={MUTED} />}
               students={notStarted} onOpen={openReview} emptyText="Everyone has started their quest."
+              clickable={false}
             />
             <PipelineColumn
               title="Awaiting review" color={SKY_TINT} icon={<CircleEllipsis size={16} color={C.blue} />}
               students={submitted} onOpen={openReview} emptyText="Nothing waiting on review."
+              clickable timestampKind="submitted"
             />
             <PipelineColumn
               title="Sent to parents" color={SKY_TINT_STRONG} icon={<CircleCheck size={16} color={C.blue} />}
               students={sent} onOpen={openReview} emptyText="No reports sent yet."
+              clickable timestampKind="sent"
             />
           </div>
         </Card>
@@ -1957,8 +2140,11 @@ export default function App() {
     go("submission");
   }
 
-  function openReview(id) {
+  const [scrollToLetter, setScrollToLetter] = useState(false);
+
+  function openReview(id, opts = {}) {
     setReviewStudentId(id);
+    setScrollToLetter(!!opts.scrollToLetter);
     setScreen("reportReview");
   }
 
@@ -2004,8 +2190,7 @@ export default function App() {
     case "studentReport": ScreenView = <StudentReportScreen go={go} studentName={studentName} myStudent={myStudent} />; break;
     case "adminLogin": ScreenView = <AdminLoginScreen go={go} />; break;
     case "adminDashboard": ScreenView = <AdminDashboard go={go} students={students} selected={selected} setSelected={setSelected} openReview={openReview} />; break;
-    case "reportReview": ScreenView = <ReportReviewScreen go={go} student={reviewStudent} onApprove={handleApprove} onRegenerate={handleRegenerate} />; break;
-    case "pipeline": ScreenView = <PipelineScreen go={go} students={students} openReview={openReview} />; break;
+    case "reportReview": ScreenView = <ReportReviewScreen go={go} student={reviewStudent} onApprove={handleApprove} onRegenerate={handleRegenerate} scrollToLetter={scrollToLetter} />; break;    case "pipeline": ScreenView = <PipelineScreen go={go} students={students} openReview={openReview} />; break;
     default: ScreenView = <LoginScreen go={go} />;
   }
 
@@ -2013,14 +2198,6 @@ export default function App() {
     <div className="qq-root">
       <GlobalStyle />
       {ScreenView}
-      {(screen === "adminDashboard" || screen === "reportReview" || screen === "pipeline") && (
-        <div style={{ position: "fixed", bottom: 90, left: 24, zIndex: 900 }} className="qq-hide-mobile">
-          <div style={{ display: "flex", gap: 8, background: C.white, padding: 8, borderRadius: 999, boxShadow: "0 12px 28px -12px rgba(0,52,104,0.3)" }}>
-            <PillButton size="sm" variant={screen === "adminDashboard" ? "navy" : "outline"} icon={<Users size={13} />} onClick={() => go("adminDashboard")}>Students</PillButton>
-            <PillButton size="sm" variant={screen === "pipeline" ? "navy" : "outline"} icon={<ShieldCheck size={13} />} onClick={() => go("pipeline")}>Pipeline</PillButton>
-          </div>
-        </div>
-      )}
       <DevNav current={screen} onNavigate={go} onReset={resetDemo} />
     </div>
   );
