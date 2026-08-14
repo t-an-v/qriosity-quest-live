@@ -666,6 +666,16 @@ function topTraits(scores, n = 2) {
 
 function generateLetter(name, scores) {
   const [first, second] = topTraits(scores, 2);
+  if (!first || !second || !TRAIT_BLURBS[first] || !TRAIT_BLURBS[second]) {
+    return `Dear Parent/Guardian of ${name},
+
+Thank you for letting ${name} take part in Qriosity Quest!
+
+Not enough data to generate insights yet.
+
+With curiosity,
+The Qriosity Quest Team`;
+  }
   return `Dear Parent/Guardian of ${name},
 
 Thank you for letting ${name} take part in Qriosity Quest! Over 18 short activities, ${name} showed real strength in ${first} and ${second} — the kind of thinking that shows up when a child is genuinely engaged, not just going through the motions.
@@ -1362,28 +1372,6 @@ function StudentDashboard({ go, studentName, myStudent, onLogout }) {
             <p style={{ color: MUTED, maxWidth: 420, margin: "0 auto 26px", fontSize: 14.5 }}>
               Your Qriosity Map is ready — here's what we discovered about how you think and learn.
             </p>
-            <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
-              <div style={{ position: "relative", flex: "1 1 220px" }}>
-                <Search size={16} color={FAINT} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
-                <input
-                  className="qq-input"
-                  style={{ paddingLeft: 38 }}
-                  placeholder="Search by student name..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-              <select className="qq-select" style={{ width: 160, flex: "0 0 auto" }} value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
-                <option value="all">All grades</option>
-                {grades.map((g) => <option key={g} value={g}>{g}</option>)}
-              </select>
-              <select className="qq-select" style={{ width: 200, flex: "0 0 auto" }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                <option value="all">All statuses</option>
-                <option value="not_started">Not started</option>
-                <option value="submitted">Submitted</option>
-                <option value="sent">Sent to parents</option>
-              </select>
-            </div>
           </div>
         )}
       </div>
@@ -1481,7 +1469,7 @@ function formatTime(sec) {
 
 function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers, setAnswers, timeLeft, setTimeLeft, scoreLoading, scoreError, studentName }) {
   useEffect(() => {
-    if (timeLeft <= 0) { submitAssessment(); return; }
+    if (timeLeft <= 0) { submitAssessment(true); return; }
     const t = setInterval(() => setTimeLeft((s) => Math.max(0, s - 1)), 1000);
     return () => clearInterval(t);
   }, [timeLeft]);
@@ -1641,7 +1629,7 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
             {scoreError && (
               <div style={{ color: C.pink, fontSize: 13.5, background: PINK_TINT, padding: "10px 16px", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                 <span>{scoreError}</span>
-                <PillButton variant="outline" size="sm" onClick={submitAssessment} style={{ padding: "6px 12px", fontSize: 12 }}>Retry</PillButton>
+                <PillButton variant="outline" size="sm" onClick={() => submitAssessment(false)} style={{ padding: "6px 12px", fontSize: 12 }}>Retry</PillButton>
               </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -1654,7 +1642,7 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
                 Back
               </PillButton>
               {isLast ? (
-                <PillButton variant="yellow" onClick={submitAssessment} disabled={scoreLoading}>
+                <PillButton variant="yellow" onClick={() => submitAssessment(false)} disabled={scoreLoading}>
                   {scoreLoading ? "Scoring..." : "Submit Quest"} 
                   {scoreLoading ? <RefreshCw size={16} className="qq-spin" style={{ marginLeft: 6 }} /> : <CheckCircle2 size={16} style={{ marginLeft: 6 }} />}
                 </PillButton>
@@ -2595,7 +2583,21 @@ export default function App() {
   // Called from the assessment's "Submit Quest" button.
   // POSTs to the real backend /score endpoint, writes results to Supabase,
   // then navigates to the submission confirmation screen.
-  async function submitAssessment() {
+  async function submitAssessment(isAutoSubmit = false) {
+    if (isAutoSubmit !== true) {
+      const unansweredCount = QUESTIONS.filter((q, i) => {
+        const val = answers[i];
+        if (q.type === "mcq") {
+          return typeof val !== "number";
+        } else {
+          return typeof val !== "string" || !val.trim();
+        }
+      }).length;
+      if (unansweredCount > 0) {
+        setScoreError("Please answer all questions before submitting");
+        return;
+      }
+    }
     setScoreLoading(true);
     setScoreError(null);
     const normalized = normalizeAnswers(answers);
