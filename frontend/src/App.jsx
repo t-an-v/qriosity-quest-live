@@ -815,16 +815,46 @@ function DevNav({ current, onNavigate, onReset }) {
 
 function AuthShell({ children }) {
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: `linear-gradient(160deg, ${C.cream} 0%, ${C.white} 55%, ${C.cream} 100%)`,
-      display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 20px",
-    }}>
-      <div style={{ width: "100%", maxWidth: 460 }}>
-        <div className="qq-card qq-fade-in" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ height: 8, background: `linear-gradient(90deg, ${C.yellow}, ${C.pink}, ${C.sky})` }} />
-          <div className="qq-auth-card-body" style={{ padding: "40px 40px 32px" }}>
-            {children}
+    <div className="qq-auth-wrapper">
+      <div className="qq-auth-container">
+        <div className="qq-auth-left">
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+            <LogoMark size={40} />
+            <span style={{ fontSize: 22, fontWeight: 800, color: C.white, fontFamily: "'Red Hat Display', sans-serif" }}>Qriosity Quest</span>
+          </div>
+          <h1 style={{ fontSize: 30, fontWeight: 800, color: C.white, lineHeight: 1.3, margin: "0 0 16px 0", textAlign: "left", fontFamily: "'Red Hat Display', sans-serif" }}>
+            Ready to explore your unique strengths? 🚀
+          </h1>
+          <p style={{ fontSize: 15, color: rgba(C.white, 0.75), lineHeight: 1.6, marginBottom: 32, textAlign: "left" }}>
+            Join our age-appropriate quest of 18 short questions to reveal how you think and learn best.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ background: rgba(C.yellow, 0.2), padding: 8, borderRadius: 10, display: "flex" }}>
+                <Compass size={18} style={{ color: C.yellow }} />
+              </span>
+              <span style={{ fontSize: 14.5, fontWeight: 700 }}>18 Fun, Interactive Questions</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ background: rgba(C.sky, 0.2), padding: 8, borderRadius: 10, display: "flex" }}>
+                <Sparkles size={18} style={{ color: C.sky }} />
+              </span>
+              <span style={{ fontSize: 14.5, fontWeight: 700 }}>Unlock Your Learning Map</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ background: rgba(C.pink, 0.2), padding: 8, borderRadius: 10, display: "flex" }}>
+                <GraduationCap size={18} style={{ color: C.pink }} />
+              </span>
+              <span style={{ fontSize: 14.5, fontWeight: 700 }}>Encouraging & Age-Appropriate</span>
+            </div>
+          </div>
+        </div>
+        <div className="qq-auth-right">
+          <div className="qq-card qq-fade-in" style={{ padding: 0, overflow: "hidden", width: "100%" }}>
+            <div className="qq-auth-top-stripe" style={{ height: 8, background: `linear-gradient(90deg, ${C.yellow}, ${C.pink}, ${C.sky})` }} />
+            <div className="qq-auth-card-body" style={{ padding: "36px 36px 28px" }}>
+              {children}
+            </div>
           </div>
         </div>
       </div>
@@ -1372,8 +1402,55 @@ function StudentDashboard({ go, studentName, myStudent, onLogout }) {
             <p style={{ color: MUTED, maxWidth: 420, margin: "0 auto 26px", fontSize: 14.5 }}>
               Your Qriosity Map is ready — here's what we discovered about how you think and learn.
             </p>
+            <PillButton variant="navy" size="lg" onClick={() => go("studentReport")}>View Report</PillButton>
           </div>
         )}
+
+        {/* Explorer Guide */}
+        <div className="qq-card" style={{ marginTop: 24, padding: 32 }}>
+          <div className="qq-heading" style={{ fontSize: 20, color: C.navy, marginBottom: 18, display: "flex", alignItems: "center", gap: 8 }}>
+            <Sparkles size={20} color={C.yellow} />
+            <span>Your Explorer Guide</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+            {[
+              { num: "1", title: "Read the Stories", desc: "Each section starts with a short story. Read it to spark your thoughts!" },
+              { num: "2", title: "Be Yourself", desc: "Choose answers that feel most natural. No wrong answers, no grades!" },
+              { num: "3", title: "Unlock the Map", desc: "Unlock a custom Qriosity Map showing your personal learning style." },
+            ].map((step) => (
+              <div key={step.num} style={{ background: rgba(C.navy, 0.03), borderRadius: 16, padding: 20, border: `1px solid ${BORDER}`, display: "flex", gap: 14 }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: "50%", background: C.navy, color: C.white,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, flexShrink: 0
+                }}>{step.num}</div>
+                <div>
+                  <div style={{ fontWeight: 700, color: C.navy, fontSize: 14.5, marginBottom: 4 }}>{step.title}</div>
+                  <p style={{ fontSize: 13, color: MUTED, margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQs */}
+        <div style={{ marginTop: 24 }}>
+          <div className="qq-heading" style={{ fontSize: 18, color: C.navy, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+            <ClipboardList size={16} color={C.blue} />
+            <span>Common Questions</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+            {[
+              { q: "Is this going to be graded?", a: "Nope! Qriosity Quest is not a test. There are no right or wrong answers. It's just a tool to help you discover your own unique learning strengths." },
+              { q: "What if I close the browser by accident?", a: "No worries! Your progress is automatically saved to this device. Simply log back in, and you will start exactly where you left off." },
+              { q: "How long does it take?", a: "You have a 45-minute timer, but most students finish in 20-30 minutes. Take your time and enjoy the questions!" },
+            ].map((faq, i) => (
+              <div key={i} className="qq-card" style={{ padding: 20 }}>
+                <div style={{ fontWeight: 700, color: C.navy, fontSize: 14, marginBottom: 6 }}>{faq.q}</div>
+                <p style={{ fontSize: 13, color: MUTED, margin: 0, lineHeight: 1.5 }}>{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1393,64 +1470,77 @@ function AssessmentIntroScreen({ go }) {
     "If your connection drops or you close the tab, your answers so far are saved — just log back in to continue.",
   ];
   const sections = [
-    { name: "Section A", title: "You And Your Thoughts", hook: "What makes your brain buzz with questions?" },
-    { name: "Section B", title: "You And The People Around You", hook: "How do you understand others & respond to what they say or do?" },
-    { name: "Section C", title: "You And The World", hook: "How do you explore ideas, news, and the bigger picture?" },
+    { name: "Section A", title: "You And Your Thoughts", color: C.yellow, hook: "What makes your brain buzz with questions?" },
+    { name: "Section B", title: "You And The People Around You", color: C.sky, hook: "How do you understand others & respond to what they say or do?" },
+    { name: "Section C", title: "You And The World", color: C.pink, hook: "How do you explore ideas, news, and the bigger picture?" },
   ];
   return (
-    <div style={{ minHeight: "100vh", background: `linear-gradient(160deg, ${C.cream}, ${C.white})`, padding: "48px 20px" }}>
-      <div className="qq-card qq-fade-in" style={{ maxWidth: 680, width: "100%", margin: "0 auto", padding: 48 }}>
-        <div style={{ textAlign: "center", marginBottom: 8 }}>
-          <LogoMark size={48} />
+    <div style={{ minHeight: "100vh", background: `linear-gradient(160deg, ${C.cream}, ${C.white})`, padding: "32px 20px", boxSizing: "border-box" }}>
+      <div className="qq-card qq-fade-in" style={{ maxWidth: 1040, width: "100%", margin: "0 auto", padding: "40px 40px 32px" }}>
+        {/* Header — always centered */}
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <LogoMark size={42} />
+          <div className="qq-heading" style={{ fontSize: 28, color: C.navy, margin: "10px 0 4px" }}>Welcome to Your Qriosity Quest</div>
+          <p style={{ color: MUTED, fontSize: 14, margin: "0 auto", maxWidth: 480, lineHeight: 1.6 }}>
+            It's an invitation to explore how your mind <strong style={{ color: C.ink }}>thinks, feels,</strong> and <strong style={{ color: C.ink }}>wonders</strong>. You're not being judged. You're being understood.
+          </p>
         </div>
-        <div className="qq-heading" style={{ fontSize: 30, color: C.navy, textAlign: "center", marginBottom: 4 }}>Welcome to Your Qriosity Quest</div>
 
-        <div className="qq-heading" style={{ fontSize: 22, color: C.ink, textAlign: "center", margin: "22px 0 10px" }}>This isn't a test.</div>
-        <p style={{ color: MUTED, textAlign: "center", fontSize: 14.5, lineHeight: 1.6, maxWidth: 480, margin: "0 auto" }}>
-          It's an invitation to explore how your mind <strong style={{ color: C.ink }}>thinks, feels,</strong> and <strong style={{ color: C.ink }}>wonders</strong>. You're not being judged. You're being understood.
-        </p>
-        <p style={{ color: MUTED, textAlign: "center", fontSize: 14.5, lineHeight: 1.6, maxWidth: 480, margin: "10px auto 0" }}>
-          Some questions may surprise you. Others might intrigue you. All are designed to tell you how your curiosity works.
-        </p>
+        {/* Two-column body on wide screens */}
+        <div className="qq-intro-container">
+          {/* Left: tips + quick-stats */}
+          <div className="qq-intro-left">
+            <div style={{ background: C.cream, borderRadius: 18, padding: 22, width: "100%", boxSizing: "border-box" }}>
+              <Eyebrow bg={C.yellow}>Before you begin</Eyebrow>
+              <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: 14 }}>
+                {tips.map((t, i) => (
+                  <div key={i} style={{ fontSize: 13.5, color: C.ink, display: "flex", gap: 8 }}>
+                    <span style={{ color: C.blue, fontWeight: 700, flexShrink: 0 }}>•</span> {t}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, margin: "30px 0" }} className="qq-report-grid">
-          <div style={{ background: C.cream, borderRadius: 18, padding: 22 }}>
-            <Eyebrow bg={C.yellow}>Before you begin</Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
-              {tips.map((t, i) => (
-                <div key={i} style={{ fontSize: 13.5, color: C.ink, display: "flex", gap: 8 }}>
-                  <span style={{ color: C.blue, fontWeight: 700 }}>•</span> {t}
+            {/* Quick stats chips */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 16 }}>
+              {[
+                { icon: <ClipboardList size={14} color={C.blue} />, label: "18 questions, 3 sections" },
+                { icon: <Clock size={14} color={C.blue} />, label: "45 minutes on the clock" },
+                { icon: <ChevronLeft size={14} color={C.blue} />, label: "Move back & forth freely" },
+              ].map(({ icon, label }) => (
+                <div key={label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: MUTED, background: BLUE_TINT, padding: "6px 12px", borderRadius: 99, border: `1px solid ${BLUE_BORDER}` }}>
+                  {icon} {label}
                 </div>
               ))}
             </div>
           </div>
-          <div style={{ background: C.cream, borderRadius: 18, padding: 22 }}>
-            <Eyebrow bg={C.yellow}>What you'll discover</Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 14 }}>
-              {sections.map((s) => (
-                <div key={s.name}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{s.name}: {s.title}</div>
-                  <div style={{ fontSize: 12.5, color: MUTED }}>{s.hook}</div>
-                </div>
-              ))}
+
+          {/* Right: sections + CTA */}
+          <div>
+            <div style={{ background: C.cream, borderRadius: 18, padding: 22, marginBottom: 20 }}>
+              <Eyebrow bg={C.yellow}>What you'll discover</Eyebrow>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 14 }}>
+                {sections.map((s) => (
+                  <div key={s.name} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: s.color, flexShrink: 0, marginTop: 4 }} />
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{s.name}: {s.title}</div>
+                      <div style={{ fontSize: 12.5, color: MUTED }}>{s.hook}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <div className="qq-heading" style={{ fontSize: 16, color: C.navy }}>Are you ready to dive into your own mind?</div>
+              <p style={{ fontSize: 13.5, color: MUTED, margin: "4px 0 18px" }}>Let's begin. Be curious. Be brave. Be completely you.</p>
+              <PillButton variant="yellow" size="lg" full onClick={() => go("assessment")}>Begin Quest <ArrowRight size={16} /></PillButton>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <a onClick={() => go("dashboard")} style={{ fontSize: 13, color: MUTED, cursor: "pointer", fontWeight: 700 }}>← Back to dashboard</a>
             </div>
           </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", marginBottom: 22 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: MUTED }}><ClipboardList size={16} color={C.blue} /> 18 questions, 3 sections</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: MUTED }}><Clock size={16} color={C.blue} /> 45 minutes on the clock</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: MUTED }}><ChevronLeft size={16} color={C.blue} /> Move back & forth freely</div>
-        </div>
-
-        <div style={{ textAlign: "center", marginBottom: 22 }}>
-          <div className="qq-heading" style={{ fontSize: 17, color: C.navy }}>Are you ready to dive into your own mind?</div>
-          <p style={{ fontSize: 14, color: MUTED, margin: "4px 0 0" }}>Let's begin. Be curious. Be brave. Be completely you.</p>
-        </div>
-
-        <PillButton variant="yellow" size="lg" full onClick={() => go("assessment")}>Begin Quest <ArrowRight size={16} /></PillButton>
-        <div style={{ marginTop: 16, textAlign: "center" }}>
-          <a onClick={() => go("dashboard")} style={{ fontSize: 13, color: MUTED, cursor: "pointer", fontWeight: 700 }}>← Back to dashboard</a>
         </div>
       </div>
     </div>
@@ -1475,7 +1565,6 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
   }, [timeLeft]);
 
   // Persist progress to localStorage on every answer or time change.
-  // Key is per-student so multiple students on the same device don't collide.
   const lsKey = `qq_progress_${studentName || "anon"}`;
   useEffect(() => {
     try {
@@ -1483,8 +1572,7 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
     } catch (_) {}
   }, [answers, currentQ, timeLeft]);
 
-  // Brief "Saved" confirmation whenever an answer changes (skips the very
-  // first render so it doesn't flash when just navigating between questions).
+  // Brief "Saved" confirmation whenever an answer changes.
   const [showSaved, setShowSaved] = useState(false);
   const mountedRef = useRef(false);
   useEffect(() => {
@@ -1498,7 +1586,6 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
   const isLast = currentQ === QUESTIONS.length - 1;
   const sectionColor = SECTION_COLORS[q.section];
   const answer = answers[currentQ];
-
   const setAnswer = (val) => setAnswers((a) => ({ ...a, [currentQ]: val }));
 
   const sectionStart = QUESTIONS.findIndex((qq) => qq.section === q.section);
@@ -1506,20 +1593,28 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
   const posInSection = currentQ - sectionStart;
   const story = SECTION_STORIES[q.section];
 
-  // The section's story auto-expands the first time you land on that
-  // section's first question, and can be toggled open again on any of
-  // that section's later questions via "Re-read the story".
+  // Mobile: story drawer toggle (resets on question change just like before)
   const [storyOpen, setStoryOpen] = useState(posInSection === 0);
   useEffect(() => { setStoryOpen(posInSection === 0); }, [currentQ]);
 
+  // The story panel content — extracted so both panes can render it
+  const StoryContent = (
+    <div>
+      <div className="qq-heading" style={{ fontSize: 15, color: C.navy, marginBottom: 8 }}>{story.title}</div>
+      <div style={{ fontSize: 13, color: C.ink, lineHeight: 1.7, whiteSpace: "pre-line" }}>
+        {story.body}
+      </div>
+    </div>
+  );
+
   return (
     <div style={{ minHeight: "100vh", background: C.cream, display: "flex", flexDirection: "column" }}>
-      {/* top bar */}
-      <div style={{ background: C.white, borderBottom: `1px solid ${BORDER}`, padding: "16px 24px" }}>
-        <div style={{ maxWidth: 720, margin: "0 auto" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+      {/* ── Top bar: full-width progress strip ── */}
+      <div style={{ background: C.white, borderBottom: `1px solid ${BORDER}`, padding: "14px 24px", position: "sticky", top: 0, zIndex: 20 }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <LogoMark size={22} />
+              <LogoMark size={20} />
               <span style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>Question {currentQ + 1} of {QUESTIONS.length}</span>
               <span style={{
                 fontSize: 11, fontWeight: 700, color: C.blue, opacity: showSaved ? 1 : 0,
@@ -1536,12 +1631,12 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
               <Clock size={14} /> {formatTime(timeLeft)}
             </div>
           </div>
-          {/* overall progress */}
-          <div style={{ height: 6, background: BORDER, borderRadius: 999, overflow: "hidden", display: "flex" }}>
-            <div style={{ width: `${((currentQ + 1) / QUESTIONS.length) * 100}%`, background: `linear-gradient(90deg, ${C.yellow}, ${C.sky})`, transition: "width 0.3s ease" }} />
+          {/* Overall progress bar */}
+          <div style={{ height: 5, background: BORDER, borderRadius: 999, overflow: "hidden" }}>
+            <div style={{ width: `${((currentQ + 1) / QUESTIONS.length) * 100}%`, background: `linear-gradient(90deg, ${C.yellow}, ${C.sky})`, transition: "width 0.3s ease", height: "100%" }} />
           </div>
-          {/* section dots */}
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
+          {/* Section dots — hidden on desktop (shown in left pane) */}
+          <div className="qq-assessment-mobile-header" style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
             {SECTIONS.map((s, si) => (
               <div key={s} style={{ display: "flex", alignItems: "center", gap: 5, opacity: si === q.section ? 1 : 0.4 }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: SECTION_COLORS[si] }} />
@@ -1549,108 +1644,172 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
               </div>
             ))}
           </div>
-          <QuestPath questions={QUESTIONS} answers={answers} currentQ={currentQ} onJump={setCurrentQ} />
         </div>
       </div>
 
-      {/* question card */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "36px 20px" }}>
-        <div className="qq-card qq-fade-in" key={currentQ} style={{ maxWidth: 640, width: "100%", padding: 40 }}>
-          <Eyebrow bg={sectionColor} color={q.section === 0 ? C.navy : C.white}>
-            Section {q.section + 1} · {SECTIONS[q.section]} · {posInSection + 1}/{sectionCount}
-          </Eyebrow>
+      {/* ── Two-pane body ── */}
+      <div style={{ flex: 1 }}>
+        <div className="qq-assessment-container">
 
-          {storyOpen ? (
-            <div style={{ background: C.cream, borderRadius: 16, padding: 20, margin: "16px 0" }}>
-              <div className="qq-heading" style={{ fontSize: 16, color: C.navy, marginBottom: 8 }}>{story.title}</div>
-              <div style={{ fontSize: 13, color: C.ink, lineHeight: 1.7, whiteSpace: "pre-line", maxHeight: 260, overflowY: "auto" }} className="qq-scrollhide">
-                {story.body}
+          {/* ── LEFT PANE (desktop only): sticky story + quest path ── */}
+          <div className="qq-assessment-left-pane">
+            <div style={{ position: "sticky", top: 72, display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Section indicator */}
+              <div style={{ display: "flex", gap: 12 }}>
+                {SECTIONS.map((s, si) => (
+                  <div key={s} style={{
+                    fontSize: 11, fontWeight: 700, color: si === q.section ? C.white : MUTED,
+                    background: si === q.section ? SECTION_COLORS[si] : SURFACE,
+                    padding: "4px 10px", borderRadius: 99, transition: "all 0.2s ease",
+                  }}>
+                    {si + 1}. {s.split(" ").slice(-1)[0]}
+                  </div>
+                ))}
               </div>
-              <button
-                type="button"
-                onClick={() => setStoryOpen(false)}
-                style={{ background: "none", border: "none", cursor: "pointer", color: C.blue, fontSize: 12.5, fontWeight: 700, marginTop: 10, padding: 0 }}
-              >
-                Hide story
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setStoryOpen(true)}
-              style={{ display: "block", background: "none", border: "none", cursor: "pointer", color: C.blue, fontSize: 12.5, fontWeight: 700, margin: "14px 0 0", padding: 0 }}
-            >
-              📖 Re-read the {story.title} story
-            </button>
-          )}
 
-          <div className="qq-heading" style={{ fontSize: 23, color: C.navy, margin: "18px 0 26px", lineHeight: 1.4 }}>
-            {q.prompt}
+              {/* Story panel — updates only when section changes */}
+              <div key={q.section} className="qq-card qq-fade-in" style={{ padding: 24 }}>
+                <Eyebrow bg={sectionColor} color={q.section === 0 ? C.navy : C.white} style={{ marginBottom: 14 }}>
+                  Section {q.section + 1} · {SECTIONS[q.section]}
+                </Eyebrow>
+                {StoryContent}
+              </div>
+
+              {/* Quest path chips */}
+              <div className="qq-card" style={{ padding: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.blue, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                  <Compass size={13} />
+                  Your quest path ({Object.keys(answers).filter(k => {
+                    const a = answers[k];
+                    return typeof a === "number" || (typeof a === "string" && a.trim().length > 0);
+                  }).length}/{QUESTIONS.length})
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {QUESTIONS.map((qq, i) => {
+                    const a = answers[i];
+                    const isAnswered = typeof a === "number" || (typeof a === "string" && a.trim().length > 0);
+                    return (
+                      <QuestPathChip
+                        key={i}
+                        index={i}
+                        isCurrent={i === currentQ}
+                        isAnswered={isAnswered}
+                        sectionColor={SECTION_COLORS[qq.section]}
+                        onClick={() => setCurrentQ(i)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {q.type === "mcq" ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {q.options.map((opt, i) => {
-                const selected = answer === i;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => setAnswer(i)}
-                    style={{
-                      textAlign: "left", padding: "14px 18px", borderRadius: 16, cursor: "pointer",
-                      border: `2px solid ${selected ? C.navy : BORDER}`,
-                      background: selected ? SKY_TINT : C.white,
-                      display: "flex", alignItems: "center", gap: 12,
-                      fontFamily: "'Red Hat Display', sans-serif", fontSize: 14.5, color: C.ink,
-                    }}
-                  >
-                    <span style={{
-                      width: 20, height: 20, borderRadius: "50%", border: `2px solid ${selected ? C.navy : BORDER_STRONG}`,
-                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    }}>
-                      {selected && <span style={{ width: 10, height: 10, borderRadius: "50%", background: C.navy }} />}
-                    </span>
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <textarea
-              className="qq-input"
-              placeholder="Type your answer here..."
-              value={answer || ""}
-              onChange={(e) => setAnswer(e.target.value)}
-              rows={5}
-            />
-          )}
+          {/* ── RIGHT PANE: question card ── */}
+          <div className="qq-assessment-right-pane">
+            <div className="qq-card qq-fade-in" key={currentQ} style={{ padding: "32px 36px" }}>
+              <Eyebrow bg={sectionColor} color={q.section === 0 ? C.navy : C.white}>
+                Section {q.section + 1} · {SECTIONS[q.section]} · {posInSection + 1}/{sectionCount}
+              </Eyebrow>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 32 }}>
-            {scoreError && (
-              <div style={{ color: C.pink, fontSize: 13.5, background: PINK_TINT, padding: "10px 16px", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                <span>{scoreError}</span>
-                <PillButton variant="outline" size="sm" onClick={() => submitAssessment(false)} style={{ padding: "6px 12px", fontSize: 12 }}>Retry</PillButton>
+              {/* Mobile story drawer (hidden on desktop) */}
+              <div className="qq-assessment-mobile-header">
+                {storyOpen ? (
+                  <div style={{ background: C.cream, borderRadius: 16, padding: 20, margin: "16px 0" }}>
+                    {StoryContent}
+                    <button
+                      type="button"
+                      onClick={() => setStoryOpen(false)}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: C.blue, fontSize: 12.5, fontWeight: 700, marginTop: 10, padding: 0 }}
+                    >
+                      Hide story
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setStoryOpen(true)}
+                    style={{ display: "block", background: "none", border: "none", cursor: "pointer", color: C.blue, fontSize: 12.5, fontWeight: 700, margin: "14px 0 0", padding: 0 }}
+                  >
+                    📖 Re-read the {story.title} story
+                  </button>
+                )}
               </div>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <PillButton
-                variant="outline"
-                onClick={() => setCurrentQ((c) => Math.max(0, c - 1))}
-                disabled={currentQ === 0 || scoreLoading}
-                icon={<ChevronLeft size={16} />}
-              >
-                Back
-              </PillButton>
-              {isLast ? (
-                <PillButton variant="yellow" onClick={() => submitAssessment(false)} disabled={scoreLoading}>
-                  {scoreLoading ? "Scoring..." : "Submit Quest"} 
-                  {scoreLoading ? <RefreshCw size={16} className="qq-spin" style={{ marginLeft: 6 }} /> : <CheckCircle2 size={16} style={{ marginLeft: 6 }} />}
-                </PillButton>
+
+              <div className="qq-heading" style={{ fontSize: 22, color: C.navy, margin: "20px 0 24px", lineHeight: 1.4 }}>
+                {q.prompt}
+              </div>
+
+              {q.type === "mcq" ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {q.options.map((opt, i) => {
+                    const selected = answer === i;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setAnswer(i)}
+                        style={{
+                          textAlign: "left", padding: "13px 18px", borderRadius: 16, cursor: "pointer",
+                          border: `2px solid ${selected ? C.navy : BORDER}`,
+                          background: selected ? SKY_TINT : C.white,
+                          display: "flex", alignItems: "center", gap: 12,
+                          fontFamily: "'Red Hat Display', sans-serif", fontSize: 14.5, color: C.ink,
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        <span style={{
+                          width: 20, height: 20, borderRadius: "50%", border: `2px solid ${selected ? C.navy : BORDER_STRONG}`,
+                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                        }}>
+                          {selected && <span style={{ width: 10, height: 10, borderRadius: "50%", background: C.navy }} />}
+                        </span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
               ) : (
-                <PillButton variant="navy" onClick={() => setCurrentQ((c) => Math.min(QUESTIONS.length - 1, c + 1))} disabled={scoreLoading}>
-                  Next <ChevronRight size={16} />
-                </PillButton>
+                <textarea
+                  className="qq-input"
+                  placeholder="Type your answer here..."
+                  value={answer || ""}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  rows={5}
+                />
               )}
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 28 }}>
+                {scoreError && (
+                  <div style={{ color: C.pink, fontSize: 13.5, background: PINK_TINT, padding: "10px 16px", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                    <span>{scoreError}</span>
+                    <PillButton variant="outline" size="sm" onClick={() => submitAssessment(false)} style={{ padding: "6px 12px", fontSize: 12 }}>Retry</PillButton>
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <PillButton
+                    variant="outline"
+                    onClick={() => setCurrentQ((c) => Math.max(0, c - 1))}
+                    disabled={currentQ === 0 || scoreLoading}
+                    icon={<ChevronLeft size={16} />}
+                  >
+                    Back
+                  </PillButton>
+                  {isLast ? (
+                    <PillButton variant="yellow" onClick={() => submitAssessment(false)} disabled={scoreLoading}>
+                      {scoreLoading ? "Scoring..." : "Submit Quest"}
+                      {scoreLoading ? <RefreshCw size={16} className="qq-spin" style={{ marginLeft: 6 }} /> : <CheckCircle2 size={16} style={{ marginLeft: 6 }} />}
+                    </PillButton>
+                  ) : (
+                    <PillButton variant="navy" onClick={() => setCurrentQ((c) => Math.min(QUESTIONS.length - 1, c + 1))} disabled={scoreLoading}>
+                      Next <ChevronRight size={16} />
+                    </PillButton>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile: quest path (collapsible) */}
+              <div className="qq-assessment-mobile-header" style={{ marginTop: 20 }}>
+                <QuestPath questions={QUESTIONS} answers={answers} currentQ={currentQ} onJump={setCurrentQ} />
+              </div>
             </div>
           </div>
         </div>
@@ -1801,7 +1960,7 @@ function QriosityRadar({ scores }) {
   );
 }
 
-function StudentReportScreen({ go, studentName, myStudent }) {
+function StudentReportScreen({ go, studentName, myStudent, onLogout }) {
   const displayName = studentName || "tanvi";
 
   // Reports are admin-gated: only reachable once a report has been approved
@@ -1956,7 +2115,7 @@ function AdminDashboard({ go, students, selected, setSelected, openReview, onLog
           </div>
         )}
 
-        <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+        <div className="qq-admin-filters-panel" style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
           <div style={{ position: "relative", flex: "1 1 220px" }}>
             <Search size={16} color={FAINT} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
             <input
@@ -1967,11 +2126,11 @@ function AdminDashboard({ go, students, selected, setSelected, openReview, onLog
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <select className="qq-select" style={{ width: 160, flex: "0 0 auto" }} value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
+          <select className="qq-select" style={{ flex: "1 1 140px", minWidth: 120 }} value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
             <option value="all">All grades</option>
             {grades.map((g) => <option key={g} value={g}>{g}</option>)}
           </select>
-          <select className="qq-select" style={{ width: 200, flex: "0 0 auto" }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select className="qq-select" style={{ flex: "1 1 180px", minWidth: 150 }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="all">All statuses</option>
             <option value="not_started">Not started</option>
             <option value="submitted">Submitted</option>
