@@ -852,7 +852,7 @@ function AuthShell({ children }) {
         <div className="qq-auth-right">
           <div className="qq-card qq-fade-in" style={{ padding: 0, overflow: "hidden", width: "100%" }}>
             <div className="qq-auth-top-stripe" style={{ height: 8, background: `linear-gradient(90deg, ${C.yellow}, ${C.pink}, ${C.sky})` }} />
-            <div className="qq-auth-card-body" style={{ padding: "36px 36px 28px" }}>
+            <div className="qq-auth-card-body">
               {children}
             </div>
           </div>
@@ -864,13 +864,13 @@ function AuthShell({ children }) {
 
 function AuthHeader({ pillLabel, pillBg, pillColor, title, emoji }) {
   return (
-    <div style={{ textAlign: "center", marginBottom: 28 }}>
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+    <div className="qq-auth-header">
+      <div className="qq-auth-logo">
         <LogoMark size={54} />
       </div>
-      <div className="qq-heading" style={{ fontSize: 26, color: C.navy, marginBottom: 16 }}>Qriosity Quest</div>
+      <div className="qq-heading qq-auth-header-title" style={{ fontSize: 26, color: C.navy }}>Qriosity Quest</div>
       <Eyebrow bg={pillBg} color={pillColor}>{pillLabel}</Eyebrow>
-      <div className="qq-heading" style={{ fontSize: 24, color: C.navy, marginTop: 14 }}>
+      <div className="qq-heading qq-auth-header-subtitle" style={{ fontSize: 24, color: C.navy }}>
         {title} {emoji}
       </div>
     </div>
@@ -879,8 +879,8 @@ function AuthHeader({ pillLabel, pillBg, pillColor, title, emoji }) {
 
 function Field({ label, children }) {
   return (
-    <div style={{ marginBottom: 18 }}>
-      <label style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: C.navy, marginBottom: 7 }}>{label}</label>
+    <div className="qq-field">
+      <label>{label}</label>
       {children}
     </div>
   );
@@ -1003,7 +1003,7 @@ function SignupScreen({ go }) {
           {loading ? "Creating Account..." : "Create My Account"}
         </PillButton>
       </form>
-      <div style={{ textAlign: "center", marginTop: 22, fontSize: 13.5, color: MUTED }}>
+      <div className="qq-auth-footer" style={{ textAlign: "center", fontSize: 13.5, color: MUTED }}>
         Already have an account?{" "}
         <a onClick={() => go("login")} style={{ color: C.blue, fontWeight: 700, cursor: "pointer" }}>Log in</a>
       </div>
@@ -1138,7 +1138,7 @@ function LoginScreen({ go }) {
       <p style={{ textAlign: "center", fontSize: 12.5, color: FAINT, marginTop: 18 }}>
         Having trouble? Contact your teacher or school administrator.
       </p>
-      <div style={{ textAlign: "center", marginTop: 10, fontSize: 13, display: "flex", justifyContent: "center", gap: 16 }}>
+      <div className="qq-auth-footer" style={{ textAlign: "center", fontSize: 13, display: "flex", justifyContent: "center", gap: 16 }}>
         <a onClick={() => go("signup")} style={{ color: C.blue, fontWeight: 700, cursor: "pointer" }}>Create an account</a>
         <a onClick={() => go("adminLogin")} style={{ color: MUTED, fontWeight: 700, cursor: "pointer" }}>Admin login →</a>
       </div>
@@ -1275,7 +1275,7 @@ function AdminLoginScreen({ go }) {
       <p style={{ textAlign: "center", fontSize: 12.5, color: FAINT, marginTop: 18 }}>
         Having trouble? Contact your Qriosity Quest program lead.
       </p>
-      <div style={{ textAlign: "center", marginTop: 10, fontSize: 13 }}>
+      <div className="qq-auth-footer" style={{ textAlign: "center", fontSize: 13 }}>
         <a onClick={() => go("login")} style={{ color: MUTED, fontWeight: 700, cursor: "pointer" }}>← Student? Log in here</a>
       </div>
     </AuthShell>
@@ -1597,6 +1597,43 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
   const [storyOpen, setStoryOpen] = useState(posInSection === 0);
   useEffect(() => { setStoryOpen(posInSection === 0); }, [currentQ]);
 
+  // Draggable Split Pane Width State
+  const [leftWidth, setLeftWidth] = useState(360);
+  const isDragging = useRef(false);
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return;
+    const container = document.querySelector(".qq-assessment-container");
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const newWidth = Math.max(260, Math.min(550, e.clientX - rect.left));
+      setLeftWidth(newWidth);
+    } else {
+      const newWidth = Math.max(260, Math.min(550, e.clientX - 100));
+      setLeftWidth(newWidth);
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  useEffect(() => {
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
   // The story panel content — extracted so both panes can render it
   const StoryContent = (
     <div>
@@ -1652,7 +1689,7 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
         <div className="qq-assessment-container">
 
           {/* ── LEFT PANE (desktop only): sticky story + quest path ── */}
-          <div className="qq-assessment-left-pane">
+          <div className="qq-assessment-left-pane" style={{ width: leftWidth }}>
             <div style={{ position: "sticky", top: 72, display: "flex", flexDirection: "column", gap: 16 }}>
               {/* Section indicator */}
               <div style={{ display: "flex", gap: 12 }}>
@@ -1704,9 +1741,12 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
             </div>
           </div>
 
+          {/* ── Drag Resize Handle (desktop only) ── */}
+          <div className="qq-resize-handle" onMouseDown={handleMouseDown} />
+
           {/* ── RIGHT PANE: question card ── */}
           <div className="qq-assessment-right-pane">
-            <div className="qq-card qq-fade-in" key={currentQ} style={{ padding: "32px 36px" }}>
+            <div className="qq-card qq-fade-in" key={currentQ} style={{ padding: "24px 28px" }}>
               <Eyebrow bg={sectionColor} color={q.section === 0 ? C.navy : C.white}>
                 Section {q.section + 1} · {SECTIONS[q.section]} · {posInSection + 1}/{sectionCount}
               </Eyebrow>
@@ -1735,12 +1775,12 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
                 )}
               </div>
 
-              <div className="qq-heading" style={{ fontSize: 22, color: C.navy, margin: "20px 0 24px", lineHeight: 1.4 }}>
+              <div className="qq-heading" style={{ fontSize: 19, color: C.navy, margin: "14px 0 18px", lineHeight: 1.4 }}>
                 {q.prompt}
               </div>
 
               {q.type === "mcq" ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 10 }}>
                   {q.options.map((opt, i) => {
                     const selected = answer === i;
                     return (
@@ -1748,19 +1788,19 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
                         key={i}
                         onClick={() => setAnswer(i)}
                         style={{
-                          textAlign: "left", padding: "13px 18px", borderRadius: 16, cursor: "pointer",
+                          textAlign: "left", padding: "10px 14px", borderRadius: 12, cursor: "pointer",
                           border: `2px solid ${selected ? C.navy : BORDER}`,
                           background: selected ? SKY_TINT : C.white,
-                          display: "flex", alignItems: "center", gap: 12,
-                          fontFamily: "'Red Hat Display', sans-serif", fontSize: 14.5, color: C.ink,
+                          display: "flex", alignItems: "center", gap: 10,
+                          fontFamily: "'Red Hat Display', sans-serif", fontSize: 13.5, color: C.ink,
                           transition: "all 0.15s ease",
                         }}
                       >
                         <span style={{
-                          width: 20, height: 20, borderRadius: "50%", border: `2px solid ${selected ? C.navy : BORDER_STRONG}`,
+                          width: 18, height: 18, borderRadius: "50%", border: `2px solid ${selected ? C.navy : BORDER_STRONG}`,
                           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                         }}>
-                          {selected && <span style={{ width: 10, height: 10, borderRadius: "50%", background: C.navy }} />}
+                          {selected && <span style={{ width: 8, height: 8, borderRadius: "50%", background: C.navy }} />}
                         </span>
                         {opt}
                       </button>
@@ -1773,11 +1813,11 @@ function AssessmentScreen({ go, submitAssessment, currentQ, setCurrentQ, answers
                   placeholder="Type your answer here..."
                   value={answer || ""}
                   onChange={(e) => setAnswer(e.target.value)}
-                  rows={5}
+                  rows={4}
                 />
               )}
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 28 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
                 {scoreError && (
                   <div style={{ color: C.pink, fontSize: 13.5, background: PINK_TINT, padding: "10px 16px", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                     <span>{scoreError}</span>
@@ -2088,7 +2128,7 @@ function AdminDashboard({ go, students, selected, setSelected, openReview, onLog
         <AdminTabBar current="adminDashboard" go={go} />
       </div>
 
-      <div style={{ maxWidth: 980, margin: "-20px auto 0", padding: "0 24px 120px" }}>
+      <div style={{ maxWidth: 980, margin: "12px auto 0", padding: "0 24px 120px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
           <span style={{ fontSize: 12.5, color: MUTED, fontWeight: 600 }}>
             Showing {filtered.length} of {students.length} students
@@ -2309,9 +2349,11 @@ function ReportReviewScreen({ go, student, onApprove, onRegenerate, scrollToLett
         </div>
       </HeroSection>
       <Wave fill={C.cream} height={48} />
-      <AdminTabBar current="adminDashboard" go={go} />
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "20px 24px 0" }}>
+        <AdminTabBar current="adminDashboard" go={go} />
+      </div>
 
-      <div style={{ maxWidth: 880, margin: "-20px auto 0", padding: "0 24px 80px" }}>
+      <div style={{ maxWidth: 880, margin: "12px auto 0", padding: "0 24px 80px" }}>
         <Card style={{ marginBottom: 24 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 32 }} className="qq-report-grid">
             <div>
@@ -2490,7 +2532,7 @@ function PipelineScreen({ go, students, openReview, onLogout }) {
         <AdminTabBar current="pipeline" go={go} />
       </div>
 
-      <div style={{ maxWidth: 980, margin: "-20px auto 0", padding: "0 24px 80px" }}>
+      <div style={{ maxWidth: 980, margin: "12px auto 0", padding: "0 24px 80px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }} className="qq-report-grid">
           {[
             { label: "Not started", value: notStarted.length, color: SURFACE_2 },
